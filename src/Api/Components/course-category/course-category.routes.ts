@@ -75,6 +75,13 @@ export class CourseCategoryRoutes {
       this.controller.update
     )
     
+    this.router.put(
+      '/sub-category/:id',
+      // authentication,
+      // authorization([RoleEnum.ADMIN]),
+      this.subController.update
+    )
+
     this.router.delete(
       '/:id',
       // authentication,

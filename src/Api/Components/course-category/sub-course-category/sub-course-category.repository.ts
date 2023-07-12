@@ -120,16 +120,16 @@ export default class SubCourseCategoryRepo {
   //   });
   // }
 
-  // public static async update(
-  //   { id, category }: { id: Category['id'], category: Prisma.CategoryUpdateInput }
-  // ) {
-  //   // console.log("--------=====",id,category);
+  public static async update(
+    { id, category }: { id: CourseSubCategory['id'], category: Prisma.CourseSubCategoryUpdateInput }
+  ) {
+    // console.log("--------=====",id,category);
 
-  //   return CategoryModel.update({
-  //     where: { id },
-  //     data: category
-  //   });
-  // }
+    return CourseSubCategoryModel.update({
+      where: { id },
+      data: category
+    });
+  }
 
   public static async delete(id: SubCourseCategory['id']) {
     return CourseSubCategoryModel.delete({

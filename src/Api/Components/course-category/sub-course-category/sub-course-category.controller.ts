@@ -79,13 +79,13 @@ export class SubCourseCategoryController {
     }
   )
 
-  // update = asyncHandler(
-  //   async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  //     const { body, params } = req;
-  //     const courseCategory = await CourseCategoryRepo.update(params.id, body);
-  //     new SuccessResponse('update success', { courseCategory }).send(res);
-  //   }
-  // )
+  update = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { body, params } = req;
+      const courseCategory = await SubCourseCategoryRepo.update({id:params.id,category:body});
+      new SuccessResponse('update success', { courseCategory }).send(res);
+    }
+  )
 
 
 
