@@ -43,9 +43,37 @@ export class CourseController {
   //   }
   // )
 
+  // create = asyncHandler(
+  //   async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+  //     const { body } = req;
+  //     console.log("course",body)
+  //     // body.name = body.name.toLowerCase();
+  //     // if (!body.slug) {
+  //     //   body.slug = body.name.slice(0, 2) + "-" + Math.floor((Math.random() * 10000) + 1);
+  //     // }
+
+   
+
+  //     const category = await CourseRepo.create({course:body});
+  //     new SuccessResponse('create success', { category }).send(res);
+  //   }
+  // )
+
+  getAll = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const user = req.user;
+
+      const course = await CourseRepo.find();
+
+      new SuccessResponse('fetch success', { course}).send(res);
+
+    }
+  )
+
   create = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
       const { body } = req;
+      console.log("course",body)
       // body.name = body.name.toLowerCase();
       // if (!body.slug) {
       //   body.slug = body.name.slice(0, 2) + "-" + Math.floor((Math.random() * 10000) + 1);
@@ -69,21 +97,30 @@ export class CourseController {
   //   }
   // )
 
-  // update = asyncHandler(
-  //   async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  //     const { body, params } = req;
-  //     body.name = body.name.toLowerCase();
-  //     const category = await CategoryRepo.update({ id: params.id, category: body });
-  //     new SuccessResponse('update success', { category }).send(res);
-  //   }
-  // )
+  update = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { body, params } = req;
+      // body.name = body.name.toLowerCase();
+      const course= await CourseRepo.update(params.id,body)
+      new SuccessResponse('update success', { course }).send(res);
+    }
+  )
 
-  // delete = asyncHandler(
-  //   async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
-  //     const { params } = req;
-  //     const category = await CategoryRepo.delete(params.id);
-  //     new SuccessResponse('delete success', { category }).send(res);
-  //   }
-  // )
+  delete = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { params } = req;
+      const category = await CourseRepo.delete(params.id);
+      new SuccessResponse('delete success', { category }).send(res);
+    }
+  )
+  getById = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const {user,parms} = req;
 
+      const course = await CourseRepo.findById(req.params.id);
+
+      new SuccessResponse('fetch success', { course }).send(res);
+
+    }
+  )
 }

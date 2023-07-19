@@ -16,26 +16,28 @@ export class CourseRoutes {
 
   initRoutes(): void {
 
-    // this.router.get(
-    //   '/:id',
-    //   this.controller.getById
-    // )
+    this.router.get(
+      '/:id',
+      this.controller.getById
+    )
 
+
+    
     
 
 
-    // this.router.get(
-    //   '/',
-    //   this.controller.getAll
-    // )
+    this.router.get(
+      '/',
+      this.controller.getAll
+    )
 
-    // this.router.post(
-    //   '/',
-    //   authentication,
-    //   authorization([RoleEnum.ADMIN]),
-    //   validator(schema.create),
-    //   this.controller.create
-    // )
+    this.router.post(
+      '/',
+      // authentication,
+      // authorization([RoleEnum.ADMIN]),
+      // validator(schema.create),
+      this.controller.create
+    )
 
     // this.router.put(
     //   '/status/:id',
@@ -45,19 +47,19 @@ export class CourseRoutes {
     //   this.controller.statusUpdate
     // )
 
-    // this.router.put(
-    //   '/:id',
-    //   authentication,
-    //   authorization([RoleEnum.ADMIN]),
-    //   this.controller.update
-    // )
+    this.router.put(
+      '/:id',
+      // authentication,
+      // authorization([RoleEnum.ADMIN]),
+      this.controller.update
+    )
 
-    // this.router.delete(
-    //   '/:id',
-    //   authentication,
-    //   authorization([RoleEnum.ADMIN]),
-    //   this.controller.delete
-    // )
+    this.router.delete(
+      '/:id',
+      // authentication,
+      // authorization([RoleEnum.ADMIN]),
+      this.controller.delete
+    )
 
   }
 

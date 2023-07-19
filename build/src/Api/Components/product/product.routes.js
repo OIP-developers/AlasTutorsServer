@@ -1,0 +1,32 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProductRoutes = void 0;
+const express_1 = require("express");
+const product_controller_1 = require("./product.controller");
+const validator_1 = __importDefault(require("../../../helpers/validator"));
+const authentication_1 = __importDefault(require("../../../middleware/authentication"));
+const authorization_1 = __importDefault(require("../../../middleware/authorization"));
+const schema_1 = __importDefault(require("./schema"));
+const Role_1 = require("../roles/Role");
+class ProductRoutes {
+    constructor() {
+        this.router = (0, express_1.Router)();
+        this.controller = new product_controller_1.ProductController();
+        this.initRoutes();
+    }
+    initRoutes() {
+        this.router.get('/:id', this.controller.getById);
+        this.router.get('/', this.controller.getAll);
+        this.router.post('/', authentication_1.default, (0, authorization_1.default)([Role_1.RoleEnum.ADMIN]), (0, validator_1.default)(schema_1.default.create), this.controller.create);
+        this.router.post('/add/category', authentication_1.default, (0, authorization_1.default)([Role_1.RoleEnum.ADMIN]), 
+        // validator(schema.create),
+        this.controller.create);
+        this.router.put('/:id', authentication_1.default, (0, authorization_1.default)([Role_1.RoleEnum.ADMIN]), this.controller.update);
+        this.router.delete('/:id', authentication_1.default, (0, authorization_1.default)([Role_1.RoleEnum.ADMIN]), this.controller.delete);
+    }
+}
+exports.ProductRoutes = ProductRoutes;
+//# sourceMappingURL=product.routes.js.map

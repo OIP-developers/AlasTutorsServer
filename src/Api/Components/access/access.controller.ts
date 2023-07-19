@@ -41,7 +41,7 @@ export class AccessController {
         req.body as User,
         accessTokenKey,
         refreshTokenKey,
-        "STUDENT",
+        req.body.role,
       );
       if (!createdUser) throw new BadRequestError('User creation field!');
       const tokens = await createTokens(createdUser, keystore.primaryKey, keystore.secondaryKey);

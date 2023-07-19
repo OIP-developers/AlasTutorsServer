@@ -1,6 +1,6 @@
 
-import { Prisma } from '@prisma/client';
-import Section, { SectionModel } from './Section';
+// import { Prisma } from '@prisma/client';
+// import Section, { SectionModel } from './Section';
 
 export default class SectionRepo {
 

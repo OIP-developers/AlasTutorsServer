@@ -76,10 +76,41 @@ export default class CourseRepo {
   //   return CategoryModel.findMany({ where: { isDeleted: false }, orderBy: { createdAt: 'desc' } })
   // }
 
-  public static async create({ course }: { course: Prisma.CourseCreateInput }) {
+  // public static async create({ course }: { course: Prisma.CourseCreateInput }) {
+  //   console.log("course",course)
+  //   return CourseModel.create({
+  //  data:course
+  //   });
+  // }
+
+  public static find(): Promise<Course[] | null> {
+    return CourseModel.findMany({ })
+  }
+
+  public static async create(course :any) {
+    console.log("course",course)
     return CourseModel.create({
-    data:course,
+   data:course
     });
+  }
+
+  public static async update(id: Course['id'], course: Prisma.CourseUpdateInput): Promise<Course | null> {
+    return CourseModel.update({
+      where: { id },
+      data:course
+    });
+  }
+  public static async delete(id: Course['id']): Promise<Course | null> {
+    return CourseModel.delete({
+      where: { id }
+    });
+  }
+
+  public static findById(id: Course['id']): Promise<Course | null> {
+    return CourseModel.findUnique({
+      where: { id },
+   
+    })
   }
 
   // public static async statusUpdate({ id, status }: { id: Category['id'], status: Prisma.CategoryUpdateInput }) {

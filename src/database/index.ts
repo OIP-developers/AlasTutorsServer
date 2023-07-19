@@ -19,7 +19,6 @@ export {
   Cart,
   ProductCategory,
   Course,
-  Section,
   CourseCategory,
   CourseSubCategory
   
