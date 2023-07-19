@@ -20,6 +20,13 @@ import * as fs from 'fs';
 import * as path from "path";
 import { promisify } from "util";
 import { Readable } from "stream";
+import * as AWS from "@aws-sdk/client-s3";
+// import fs from 'fs';
+// import aws from 'aws-sdk'
+import { v4 as uuidv4 } from 'uuid';
+import { Upload } from "@aws-sdk/lib-storage";
+// import { Readable } from "stream";
+// import { S3Client } from "@aws-sdk/client-s3";
 
 export class FileService {
 
@@ -34,13 +41,14 @@ export class FileService {
     private accessKeyId = 'DO00MURUA6LCEBJHDPGX';
     private secretAccessKey = 'aKJ2TZhAUr6lss3BuYk6tbaKjrnG971WXuBvAmk5T3M';
 
-    private s3 = new S3Client({
-        region: this.region,
-        credentials: {
-            accessKeyId: this.accessKeyId,
-            secretAccessKey: this.secretAccessKey
-        }
-    });
+     
+  s3Client: AWS.S3Client = new S3Client({
+    region: "us-east-2",
+    credentials: {
+      accessKeyId: "AKIAQL55CZLWSF7X4RGA",
+      secretAccessKey: "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",
+    },
+  });
 
     uploadOnCloudinary = async (req: any): Promise<any> => {
         const fileData: any = req.files;
@@ -68,103 +76,103 @@ export class FileService {
 
     }
 
-    public uploadFileToS3 = async ({ filePath, fileName, folderName }: { filePath: string, folderName: string, fileName: string }) => {
-        const fileSize = fs.statSync(filePath).size;
-        const multipartUploadThreshold = 5 * 1024 * 1024; // 5 MB
-        const partSize = 5 * 1024 * 1024; // 5 MB
-        const numberOfParts = Math.ceil(fileSize / partSize);
-        const objectKey = `${folderName}/${fileName}`;
-        console.log("CHEKJAHDKLJVADLKFH")
+    // public uploadFileToS3 = async ({ filePath, fileName, folderName }: { filePath: string, folderName: string, fileName: string }) => {
+    //     const fileSize = fs.statSync(filePath).size;
+    //     const multipartUploadThreshold = 5 * 1024 * 1024; // 5 MB
+    //     const partSize = 5 * 1024 * 1024; // 5 MB
+    //     const numberOfParts = Math.ceil(fileSize / partSize);
+    //     const objectKey = `${folderName}/${fileName}`;
+    //     console.log("CHEKJAHDKLJVADLKFH")
 
-        const createMultipartUploadCommand = new CreateMultipartUploadCommand({
-            Bucket: this.bucketName,
-            Key: objectKey
-        });
-        const { UploadId } = await this.s3.send(createMultipartUploadCommand);
+    //     const createMultipartUploadCommand = new CreateMultipartUploadCommand({
+    //         Bucket: this.bucketName,
+    //         Key: objectKey
+    //     });
+    //     const { UploadId } = await this.s3.send(createMultipartUploadCommand);
 
-        const parts = [];
-        let start = 0;
-        for (let i = 1; i <= numberOfParts; i++) {
-            const end = Math.min(start + partSize, fileSize);
-            const partParams = {
-                Bucket: this.bucketName,
-                Key: objectKey,
-                PartNumber: i,
-                UploadId,
-                Body: fs.createReadStream(filePath, { start, end: end - 1 }),
-                ContentLength: end - start
-            };
-            const uploadPartCommand = new UploadPartCommand(partParams);
-            const { ETag } = await this.s3.send(uploadPartCommand);
-            parts.push({ PartNumber: i, ETag });
-            start = end;
-        }
+    //     const parts = [];
+    //     let start = 0;
+    //     for (let i = 1; i <= numberOfParts; i++) {
+    //         const end = Math.min(start + partSize, fileSize);
+    //         const partParams = {
+    //             Bucket: this.bucketName,
+    //             Key: objectKey,
+    //             PartNumber: i,
+    //             UploadId,
+    //             Body: fs.createReadStream(filePath, { start, end: end - 1 }),
+    //             ContentLength: end - start
+    //         };
+    //         const uploadPartCommand = new UploadPartCommand(partParams);
+    //         const { ETag } = await this.s3.send(uploadPartCommand);
+    //         parts.push({ PartNumber: i, ETag });
+    //         start = end;
+    //     }
 
-        const completeMultipartUploadParams = {
-            Bucket: this.bucketName,
-            Key: objectKey,
-            UploadId,
-            MultipartUpload: {
-                Parts: parts
-            }
-        };
-        const completeMultipartUploadCommand = new CompleteMultipartUploadCommand(completeMultipartUploadParams);
-        const { Location, Key } = await this.s3.send(completeMultipartUploadCommand);
-        return { location: Location, key: Key }
-    }
+    //     const completeMultipartUploadParams = {
+    //         Bucket: this.bucketName,
+    //         Key: objectKey,
+    //         UploadId,
+    //         MultipartUpload: {
+    //             Parts: parts
+    //         }
+    //     };
+    //     const completeMultipartUploadCommand = new CompleteMultipartUploadCommand(completeMultipartUploadParams);
+    //     const { Location, Key } = await this.s3.send(completeMultipartUploadCommand);
+    //     return { location: Location, key: Key }
+    // }
 
-    getFolderSize = async (folderPath: string): Promise<number> => {
-        let size = 0;
-        let isTruncated = true;
-        let continuationToken = undefined;
+    // getFolderSize = async (folderPath: string): Promise<number> => {
+    //     let size = 0;
+    //     let isTruncated = true;
+    //     let continuationToken = undefined;
 
-        while (isTruncated) {
-            const response = await this.s3.send(new ListObjectsV2Command({
-                Bucket: this.bucketName,
-                Prefix: folderPath,
-                ContinuationToken: continuationToken
-            }));
+    //     while (isTruncated) {
+    //         const response = await this.s3.send(new ListObjectsV2Command({
+    //             Bucket: this.bucketName,
+    //             Prefix: folderPath,
+    //             ContinuationToken: continuationToken
+    //         }));
 
-            const objects = response.Contents;
-            objects && (size += objects.reduce((acc, object) => acc + Number(object.Size), 0)); // object.Size
+    //         const objects = response.Contents;
+    //         objects && (size += objects.reduce((acc, object) => acc + Number(object.Size), 0)); // object.Size
 
-            (typeof response.IsTruncated === 'boolean') && (isTruncated = response.IsTruncated);
-            // continuationToken = response.NextContinuationToken;
-            // continuationToken = "ddddd" // response.NextContinuationToken
-        }
+    //         (typeof response.IsTruncated === 'boolean') && (isTruncated = response.IsTruncated);
+    //         // continuationToken = response.NextContinuationToken;
+    //         // continuationToken = "ddddd" // response.NextContinuationToken
+    //     }
 
-        return size;
-    }
+    //     return size;
+    // }
 
-    downloadS3FolderAsZip = async ({ folderPath, zipFilePath }: { folderPath: string, zipFilePath: string }) => {
-        const zipStream = fs.createWriteStream(zipFilePath);
-        const archive = archiver("zip");
+    // downloadS3FolderAsZip = async ({ folderPath, zipFilePath }: { folderPath: string, zipFilePath: string }) => {
+    //     const zipStream = fs.createWriteStream(zipFilePath);
+    //     const archive = archiver("zip");
 
-        archive.pipe(zipStream);
+    //     archive.pipe(zipStream);
 
-        const objectsToDownload = await this.getObjectsInFolder(this.bucketName, folderPath);
+    //     const objectsToDownload = await this.getObjectsInFolder(this.bucketName, folderPath);
 
-        for (const key of objectsToDownload) {
-            const getObjectCommand = new GetObjectCommand({ Bucket: this.bucketName, Key: key });
-            const getObjectResponse = await this.s3.send(getObjectCommand);
+    //     for (const key of objectsToDownload) {
+    //         const getObjectCommand = new GetObjectCommand({ Bucket: this.bucketName, Key: key });
+    //         const getObjectResponse = await this.s3.send(getObjectCommand);
             
-            // @ts-ignore
-            archive.append(getObjectResponse.Body, { name: key });
-        }
+    //         // @ts-ignore
+    //         archive.append(getObjectResponse.Body, { name: key });
+    //     }
 
-        await archive.finalize().then(() => {
-            console.log(`Downloaded S3 bucket folder ${folderPath} as zip file to ${zipFilePath}`);
-        });
+    //     await archive.finalize().then(() => {
+    //         console.log(`Downloaded S3 bucket folder ${folderPath} as zip file to ${zipFilePath}`);
+    //     });
 
-    }
+    // }
 
-    public getObjectsInFolder = async (bucketName: string, folderPath: string): Promise<string[]> => {
-        const listObjectsCommand = new ListObjectsCommand({ Bucket: bucketName, Prefix: folderPath });
-        const listObjectsResponse = await this.s3.send(listObjectsCommand);
+    // public getObjectsInFolder = async (bucketName: string, folderPath: string): Promise<string[]> => {
+    //     const listObjectsCommand = new ListObjectsCommand({ Bucket: bucketName, Prefix: folderPath });
+    //     const listObjectsResponse = await this.s3.send(listObjectsCommand);
 
-        const objects = listObjectsResponse.Contents?.map((obj) => obj.Key!);
-        return objects?.filter((key) => !key.endsWith("/")) ?? [];
-    }
+    //     const objects = listObjectsResponse.Contents?.map((obj) => obj.Key!);
+    //     return objects?.filter((key) => !key.endsWith("/")) ?? [];
+    // }
 
 
     // downloadS3Folder = async ({ folderPath, localPath }: { folderPath: string, localPath: string }) => {
@@ -277,5 +285,25 @@ export class FileService {
     //     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
     //     }
     // )
+
+    public async uploadOnS3({ file }: { file: any }) {
+      console.log("file.path",file)
+      const fileStream = fs.createReadStream(file.path);
+      const fileModified = uuidv4() + file.name.trim().replaceAll(' ', '-')
+      console.log(fileModified);
+      
+      const upload = new Upload({
+        client: this.s3Client,
+        params: {
+          Bucket: "static-files-lms",
+          Key: `${fileModified}`,
+          Body: fileStream,
+        },
+      });
+  
+      const result = await upload.done();
+      return result
+    }
+  
 
 }

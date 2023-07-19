@@ -18,15 +18,15 @@ export class FileRoutes {
 
     this.router.use(formidableMiddleware())
 
-    this.router.post(
-      '/',
-      this.controller.fileUpload
-    )
+    // this.router.post(
+    //   '/',
+    //   this.controller.fileUpload
+    // )
 
-    this.router.get(
-      '/',
-      this.controller.downloadFolder
-    )
+    // this.router.get(
+    //   '/',
+    //   this.controller.downloadFolder
+    // )
 
     // this.router.post(
     //   '/image',
@@ -37,6 +37,13 @@ export class FileRoutes {
     //   '/image/editor',
     //   this.controller.imageUploadForEditor
     // )
+    this.router.post(
+      '/',
+      this.controller.videoUploadToS3
+    )
+
+
+    
 
   }
 

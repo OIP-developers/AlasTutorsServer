@@ -7,12 +7,13 @@ import { BadRequestError } from "../../../core/ApiError";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryResponse } from "./interface"
 import { FileService } from './file.service'
+import { FileRepo } from "./image.repository";
 // import { NoDataError, BadRequestError } from '../../../core/ApiError';
 // import _ from 'lodash';
 
 export class FileController {
 
-    service: FileService = new FileService()
+  readonly fileService: FileService = new FileService()
 
     uploadOnCloudinary = async (req: any): Promise<CloudinaryResponse> => {
         const fileData: any = req.files;
@@ -40,36 +41,58 @@ export class FileController {
 
     }
 
-    fileUpload = asyncHandler(
-        async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-            const { path, size, type, name }: any = req.files.file;
-            const { destPath }: { destPath: string } = req.query;
+    // fileUpload = asyncHandler(
+    //     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+    //         const { path, size, type, name }: any = req.files.file;
+    //         const { destPath }: { destPath: string } = req.query;
 
-            const file = await this.service.uploadFileToS3({
-                fileName: name,
-                filePath: path,
-                folderName: destPath
-            });
-            // const { file } = await FileRepo.create(uploaded);
-            new SuccessResponse('Added successfully', { file }).send(res);
-        }
-    )
+    //         const file = await this.service.uploadFileToS3({
+    //             fileName: name,
+    //             filePath: path,
+    //             folderName: destPath
+    //         });
+    //         // const { file } = await FileRepo.create(uploaded);
+    //         new SuccessResponse('Added successfully', { file }).send(res);
+    //     }
+    // )
 
-    downloadFolder = asyncHandler(
-        async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-            // const { path, size, type, name }: any = req.files.file;
-            // console.log('====================================');
-            // console.log(path);
-            // console.log('====================================');
-            // const { destPath }: { destPath: string } = req.query;
+    // downloadFolder = asyncHandler(
+    //     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+    //         // const { path, size, type, name }: any = req.files.file;
+    //         // console.log('====================================');
+    //         // console.log(path);
+    //         // console.log('====================================');
+    //         // const { destPath }: { destPath: string } = req.query;
 
-            await this.service.downloadS3FolderAsZip({
-                folderPath: "faizan/",
-                zipFilePath: "/home/faizan_ahmed/Code/test.zip"
-            });
-            // const { file } = await FileRepo.create(uploaded);
-            new SuccessResponse('Added successfully', {}).send(res);
-        }
+    //         await this.service.downloadS3FolderAsZip({
+    //             folderPath: "faizan/",
+    //             zipFilePath: "/home/faizan_ahmed/Code/test.zip"
+    //         });
+    //         // const { file } = await FileRepo.create(uploaded);
+    //         new SuccessResponse('Added successfully', {}).send(res);
+    //     }
+    // )
+
+    videoUploadToS3 = asyncHandler(
+      async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+  
+        const source = await this.fileService.uploadOnS3({ file: req.files.file })
+        console.log("files Data",req.files)
+  
+        const { file } = await FileRepo.create({
+          // @ts-ignore
+          private_source_url: source.Location,
+          // @ts-ignore
+          public_source_url: source.Location,
+          size: `${req.files.file.size}`,
+          dimensions: `0 x 0`,
+          length: "jjjjj",
+          type: `${req.files.file.type}`,
+          folderId:req.query.folderId
+        } as any);
+  
+        new SuccessResponse('Added successfully', { file }).send(res);
+      }
     )
 
     // imageUpload = asyncHandler(

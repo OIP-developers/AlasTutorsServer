@@ -17,3 +17,18 @@
 //     }
 
 // }
+
+import { Request } from "express"
+import File, { FileModel } from './File';
+// import { v2 as cloudinary } from "cloudinary";
+import { BadRequestError } from '../../../core/ApiError';
+
+export class FileRepo {
+
+  public static async create(data: File): Promise<{ file: File }> {
+    console.log("datadatadata",data)
+    let file = await FileModel.create({ data });
+    return { file };
+  }
+
+}
