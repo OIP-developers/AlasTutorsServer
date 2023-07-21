@@ -1,55 +1,55 @@
-import { Router } from 'express';
-import { ExampleController } from './example.controller';
-import validator, { ValidationSource } from '../../../helpers/validator';
-import authentication from '../../../middleware/authentication';
-import authorization from '../../../middleware/authorization';
-import schema from './schema'
-import { RoleEnum } from '../roles/Role'
+// import { Router } from 'express';
+// import { ExampleController } from './example.controller';
+// import validator, { ValidationSource } from '../../../helpers/validator';
+// import authentication from '../../../middleware/authentication';
+// import authorization from '../../../middleware/authorization';
+// import schema from './schema'
+// import { RoleEnum } from '../roles/Role'
 
-export class ExampleRoutes {
+// export class ExampleRoutes {
 
-  readonly router: Router = Router();
-  readonly controller: ExampleController = new ExampleController()
+//   readonly router: Router = Router();
+//   readonly controller: ExampleController = new ExampleController()
 
-  constructor() {
-    this.initRoutes();
-  }
+//   constructor() {
+//     this.initRoutes();
+//   }
 
-  initRoutes(): void {
+//   initRoutes(): void {
 
-    this.router.get(
-      '/:id',
-      this.controller.getById
-    )
+//     this.router.get(
+//       '/:id',
+//       this.controller.getById
+//     )
 
-    this.router.get(
-      '/',
-      this.controller.getAll
-    )
+//     this.router.get(
+//       '/',
+//       this.controller.getAll
+//     )
 
-    this.router.post(
-      '/',
-      authentication,
-      authorization([RoleEnum.ADMIN]),
-      validator(schema.create),
-      this.controller.create
-    )
+//     this.router.post(
+//       '/',
+//       authentication,
+//       authorization([RoleEnum.ADMIN]),
+//       validator(schema.create),
+//       this.controller.create
+//     )
 
 
-    this.router.put(
-      '/:id',
-      authentication,
-      authorization([RoleEnum.ADMIN]),
-      this.controller.update
-    )
+//     this.router.put(
+//       '/:id',
+//       authentication,
+//       authorization([RoleEnum.ADMIN]),
+//       this.controller.update
+//     )
 
-    this.router.delete(
-      '/:id',
-      authentication,
-      authorization([RoleEnum.ADMIN]),
-      this.controller.delete
-    )
+//     this.router.delete(
+//       '/:id',
+//       authentication,
+//       authorization([RoleEnum.ADMIN]),
+//       this.controller.delete
+//     )
 
-  }
+//   }
 
-}
+// }

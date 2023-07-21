@@ -128,6 +128,7 @@ export default class UserRepo {
     user.phone_status = 'VERIFIED' // 'VERIFIED'; // 'PENDING'
     user.gender = 'MALE'
     user.createdAt = user.updatedAt = now;
+    user.stripe_customerId=''
     // @ts-ignore 
     delete user.role
 

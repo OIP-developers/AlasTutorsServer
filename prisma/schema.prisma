@@ -75,25 +75,13 @@ model Tokenstore {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Example {
-  id   String @id @default(uuid())
-  name String
-
-  status     Status?   @default(PUBLIC)
-  isPublish  Boolean?  @default(true)
-  isVerified Boolean?  @default(true)
-  isDeleted  Boolean?  @default(false)
-  createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @updatedAt
-}
-
 model User {
   id                String      @id @default(uuid())
   email             String?     @unique
   username          String?     @unique
   password          String
   phone_status      PhoneStatus
-  stripe_customerId String?
+  stripe_customerId String
 
   first_name      String?
   last_name       String?
@@ -103,6 +91,14 @@ model User {
   profile         String?
   dateOfBirth     DateTime?
 
+  address   String?
+  city      String?
+  state     String?
+  zipCode   Int?
+  country   String?
+  timezone  String?
+  aboutInfo String?
+
   status     Status?   @default(PUBLIC)
   isAccepted Boolean?  @default(false)
   isVerified Boolean?  @default(true)
@@ -111,17 +107,17 @@ model User {
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
 
-  roleId String @default("167fab49-72bc-4e03-80e6-439a9c00c12c")
+  roleId String
   role   Role   @relation(fields: [roleId], references: [id])
 
   invoices   Invoice[]
   Keystore   Keystore[]
   tokenstore Tokenstore[]
-  wallet     Wallet?
-  Order      Order[]
-  Cart       Cart[]
-
-  courseReview courseReview[]
+  reviews    CourseReview[]
+  files      File[]
+  courses    Course[]
+  cart       CartItem[]
+  orders     Order[]
 }
 
 model File {
@@ -130,44 +126,23 @@ model File {
   public_source_url  String
   private_source_url String
 
+  uploadedBy   User?   @relation(fields: [uploadedById], references: [id])
+  uploadedById String?
+
   size       String
   type       String
   dimensions String?
   length     String?
 
-  isPublish  Boolean?  @default(true)
-  isVerified Boolean?  @default(true)
-  isDeleted  Boolean?  @default(false)
-  createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @updatedAt
-  Video      Video[]
-}
+  status    Status?   @default(PUBLIC)
+  isDeleted Boolean?  @default(false)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 
-model Wallet {
-  id String @id @default(uuid())
-
-  coins Int @default(0)
-
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Invoice {
-  id       String   @id @default(uuid())
-  stripe   String   @unique
-  price    Int
-  currency Currency
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId String @unique
-
-  status    InvoiceStatus
-  isDeleted Boolean?      @default(false)
-  createdAt DateTime?     @default(now())
-  updatedAt DateTime?     @updatedAt
+  courseThumbnail Course[] @relation("thumbnail")
+  courseBanner    Course[] @relation("banner")
+  courseVideos    Video[]
+  courseAudios    Audio[]
 }
 
 enum TokenType {
@@ -187,6 +162,8 @@ enum SubscriptionType {
 
 enum Currency {
   USD
+  PKR
+  INR
 }
 
 enum InvoiceStatus {
@@ -202,156 +179,149 @@ enum Status {
   DRAFT
 }
 
-model Category {
-  id          String    @id @default(uuid())
+model CourseCategory {
+  id   String @id @default(uuid())
+  slug String @unique @default(uuid())
+
   name        String
-  slug        String    @unique @default(uuid())
-  title       String?
   description String?
-  order       Int
-  image       String?
-  // parent_categoryId String?
-  // parent_category   Category? @relation("SubCategoryCategory", fields: [parent_categoryId], references: [id], onDelete: Cascade)
-  status      Status?   @default(PUBLIC)
-  isDeleted   Boolean?  @default(false)
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
+  thumbnail   String?
 
-  // subCategory     SubCategory[]
-  productCategory ProductCategory[]
-  // categories      Category[]        @relation("SubCategoryCategory")
+  status    Status?   @default(PUBLIC)
+  deletedAt DateTime?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  courses Course[]
 }
 
-model Product {
-  id             String    @id @default(uuid())
-  title          String
-  desc           String    @db.Text
-  price          Int
-  featured_image String
-  status         Status?   @default(PUBLIC)
-  isDeleted      Boolean?  @default(false)
-  createdAt      DateTime? @default(now())
-  updatedAt      DateTime? @updatedAt
-
-  orderItems OrderItems[]
-  categories ProductCategory[]
-  // gallery    ProductImage[]
-  // tags       ProductTag[]
-  Cart       Cart[]
-}
-
-model ProductCategory {
+model CourseReview {
   id String @id @default(uuid())
 
+  rating  Float
+  comment String
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  course   Course? @relation(fields: [courseId], references: [id])
+  courseId String?
+
+  status    Status?   @default(PUBLIC)
+  deletedAt DateTime?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Course {
+  id   String @id @default(uuid())
+  slug String @unique @default(uuid())
+
+  title       String
+  description String
+  rating      Float? @default(0.0)
+
+  thumbnail   File   @relation("thumbnail", fields: [thumbnailId], references: [id])
+  thumbnailId String
+
+  banner   File   @relation("banner", fields: [bannerId], references: [id])
+  bannerId String
+
+  price    Float
+  currency Currency? @default(USD)
+
+  category   CourseCategory? @relation(fields: [categoryId], references: [id])
   categoryId String
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  // subCategoryId String?
-  // subCategory   SubCategory? @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
 
-  productId String?
-  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  status    Status?   @default(PUBLIC)
+  deletedAt DateTime?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  videos     Video[]
+  reviews    CourseReview[]
+  audios     Audio[]
+  tags       Tag[]
+  cartItems  CartItem[]
+  OrderItems OrderItems[]
+}
+
+model Tag {
+  id String @id @default(uuid())
+
+  title String
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id])
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 }
 
-model CourseCategory {
-  id                String              @id @default(uuid())
-  name              String
-  description       String?
-  imageUrl          String?
-  courseSubCategory CourseSubCategory[]
-}
-
-model CourseSubCategory {
-  id               String          @id @default(uuid())
-  name             String
-  description      String?
-  imageUrl         String?
-  courseCategory   CourseCategory? @relation(fields: [courseCategoryId], references: [id])
-  courseCategoryId String?
-  courses          Course[]
-}
-
-model courseReview {
-  id       String  @id @default(uuid())
-  user     User?   @relation(fields: [userId], references: [id])
-  userId   String?
-  course   Course? @relation(fields: [courseId], references: [id])
-  courseId String?
-  review   Float
-  comment  String
-}
-
-model Course {
-  id                  String             @id @default(uuid())
-  title               String
-  description         String
-  price               Int?
-  about               String?
-  discussion          String?
-  imageUrl            String?
-  courseSubCategory   CourseSubCategory? @relation(fields: [courseSubCategoryId], references: [id])
-  courseSubCategoryId String?
-  rating              Float?
-  Videos              Video[]
-  courseReviews       courseReview[]
-}
-
 model Video {
-  id       String  @id @default(uuid())
-  title    String
-  content  String
+  id   String @id @default(uuid())
+  slug String @unique @default(uuid())
+
+  title       String
+  description String
+
   course   Course? @relation(fields: [courseId], references: [id])
   courseId String?
-  file     File?   @relation(fields: [fileId], references: [id])
-  fileId   String?
+
+  media   File?   @relation(fields: [mediaId], references: [id])
+  mediaId String?
+
+  status    Status?   @default(PUBLIC)
+  deletedAt DateTime?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 }
 
-// model ProductImage {
-//   id    String  @id @default(uuid())
-//   image String?
+model Audio {
+  id   String @id @default(uuid())
+  slug String @unique @default(uuid())
 
-//   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-//   productId String
+  title       String
+  description String
 
-//   createdAt DateTime? @default(now())
-//   updatedAt DateTime? @updatedAt
-// }
+  course   Course? @relation(fields: [courseId], references: [id])
+  courseId String?
 
-// model ProductTag {
-//   id  String @id @default(uuid())
-//   tag String
+  media   File?   @relation(fields: [mediaId], references: [id])
+  mediaId String?
 
-//   product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-//   productId String?
+  status    Status?   @default(PUBLIC)
+  deletedAt DateTime?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
 
-//   createdAt DateTime? @default(now())
-//   updatedAt DateTime? @updatedAt
-// }
+model CartItem {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+
+  deletedAt DateTime?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
 
 model Order {
   id String @id @default(uuid())
 
-  user   User?   @relation(fields: [userId], references: [id])
-  userId String?
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  company_name String?
-  fullname     String?
-  email        String?
-  phone        Int?
+  sub_total Int
+  total     Int
 
-  address  String?
-  city     String?
-  state    String?
-  zip_code String?
-  country  String?
-
-  sub_total Int?
-  total     Int?
-
-  status    Status?      @default(PUBLIC)
   isDeleted Boolean?     @default(false)
   createdAt DateTime?    @default(now())
   updatedAt DateTime?    @updatedAt
@@ -359,35 +329,36 @@ model Order {
   items     OrderItems[]
 }
 
-model Cart {
+model OrderItems {
   id String @id @default(uuid())
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String
 
-  Product   Product @relation(fields: [ProductId], references: [id], onDelete: Cascade)
-  ProductId String
+  price Int
 
-  quantity Int?
+  course   Course @relation(fields: [CourseId], references: [id])
+  CourseId String
 
   isDeleted Boolean?  @default(false)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 }
 
-model OrderItems {
-  id String @id @default(uuid())
+model Invoice {
+  id       String   @id @default(uuid())
+  stripe   String   @unique
+  price    Int
+  currency Currency
 
-  order   Order?  @relation(fields: [orderId], references: [id])
-  orderId String?
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
 
-  quantity Int?
-  price    Int?
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String @unique
 
-  product   Product? @relation(fields: [productId], references: [id])
-  productId String?
-
-  isDeleted Boolean?  @default(false)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  status    InvoiceStatus
+  isDeleted Boolean?      @default(false)
+  createdAt DateTime?     @default(now())
+  updatedAt DateTime?     @updatedAt
 }

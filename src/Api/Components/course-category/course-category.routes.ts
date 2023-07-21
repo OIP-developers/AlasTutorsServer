@@ -6,22 +6,22 @@ import authorization from '../../../middleware/authorization';
 // import schema from './schema'
 import { RoleEnum } from '../roles/Role'
 import { CourseCategoryController } from './course-category.controller';
-import {SubCourseCategoryController} from './sub-course-category/sub-course-category.controller'
+// import {SubCourseCategoryController} from './sub-course-category/sub-course-category.controller'
 export class CourseCategoryRoutes {
 
   readonly router: Router = Router();
   readonly controller:CourseCategoryController = new CourseCategoryController()
-  readonly subController:SubCourseCategoryController =new SubCourseCategoryController()
+  // readonly subController:SubCourseCategoryController =new SubCourseCategoryController()
 
   constructor() {
     this.initRoutes();
   }
 
   initRoutes(): void {
-   this.router.get(
-      '/sub-category',
-      this.subController.getAll
-    )
+  //  this.router.get(
+  //     '/sub-category',
+  //     this.subController.getAll
+  //   )
     this.router.get(
       '/:id',
       this.controller.getById
@@ -52,13 +52,13 @@ export class CourseCategoryRoutes {
       this.controller.create
     )
 
-    this.router.post(
-      '/sub-category',
-      // authentication,
-      // authorization([RoleEnum.ADMIN]),
-      // validator(schema.create),
-      this.subController.create
-    )
+    // this.router.post(
+    //   '/sub-category',
+    //   // authentication,
+    //   // authorization([RoleEnum.ADMIN]),
+    //   // validator(schema.create),
+    //   this.subController.create
+    // )
 
     // this.router.put(
     //   '/status/:id',
@@ -75,12 +75,12 @@ export class CourseCategoryRoutes {
       this.controller.update
     )
     
-    this.router.put(
-      '/sub-category/:id',
-      // authentication,
-      // authorization([RoleEnum.ADMIN]),
-      this.subController.update
-    )
+    // this.router.put(
+    //   '/sub-category/:id',
+    //   // authentication,
+    //   // authorization([RoleEnum.ADMIN]),
+    //   this.subController.update
+    // )
 
     this.router.delete(
       '/:id',
@@ -89,12 +89,12 @@ export class CourseCategoryRoutes {
       this.controller.delete
     )
  
-    this.router.delete(
-      '/sub-category/:id',
-      // authentication,
-      // authorization([RoleEnum.ADMIN]),
-      this.subController.delete
-    )
+    // this.router.delete(
+    //   '/sub-category/:id',
+    //   // authentication,
+    //   // authorization([RoleEnum.ADMIN]),
+    //   this.subController.delete
+    // )
   
 
  

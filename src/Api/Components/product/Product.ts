@@ -1,7 +1,7 @@
-import { prisma, IPrisma, Product } from '../../../database';
+// import { prisma, IPrisma, Product } from '../../../database';
 
-export const DOCUMENT_NAME = IPrisma.ModelName.Product;
+// export const DOCUMENT_NAME = IPrisma.ModelName.Product;
 
-export default Product;
+// export default Product;
 
-export const ProductModel = prisma.product;
+// export const ProductModel = prisma.product;
