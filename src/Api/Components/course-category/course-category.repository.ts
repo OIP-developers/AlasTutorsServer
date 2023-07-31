@@ -99,9 +99,13 @@ export default class CourseCategoryRepo {
     });
   }
 
-  public static findById(id: CourseCategory['id']): Promise<CourseCategory | null> {
+  public static findById(id: CourseCategory['id']): Promise<any | null> {
     return CourseCategoryModel.findUnique({
       where: { id },
+      select:{
+        // id:true,
+        courses:true
+      }
    
     })
   }

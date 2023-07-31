@@ -143,6 +143,10 @@ model File {
   courseBanner    Course[] @relation("banner")
   courseVideos    Video[]
   courseAudios    Audio[]
+
+  mediaVideo Video[] @relation("media")
+
+  thumbnailVideo Video[] @relation("thumbnailVideo")
 }
 
 enum TokenType {
@@ -185,7 +189,7 @@ model CourseCategory {
 
   name        String
   description String?
-  thumbnail   String?
+  imageUrl    String?
 
   status    Status?   @default(PUBLIC)
   deletedAt DateTime?
@@ -221,20 +225,20 @@ model Course {
   description String
   rating      Float? @default(0.0)
 
-  thumbnail   File   @relation("thumbnail", fields: [thumbnailId], references: [id])
-  thumbnailId String
+  thumbnail   File?   @relation("thumbnail", fields: [thumbnailId], references: [id], onDelete: Cascade)
+  thumbnailId String?
 
-  banner   File   @relation("banner", fields: [bannerId], references: [id])
-  bannerId String
+  banner   File?   @relation("banner", fields: [bannerId], references: [id], onDelete: Cascade)
+  bannerId String?
 
   price    Float
   currency Currency? @default(USD)
 
-  category   CourseCategory? @relation(fields: [categoryId], references: [id])
-  categoryId String
+  category   CourseCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String?
 
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdById String?
 
   status    Status?   @default(PUBLIC)
   deletedAt DateTime?
@@ -271,13 +275,18 @@ model Video {
   course   Course? @relation(fields: [courseId], references: [id])
   courseId String?
 
-  media   File?   @relation(fields: [mediaId], references: [id])
+  media   File?   @relation("media", fields: [mediaId], references: [id])
   mediaId String?
+
+  thumbnail   File?   @relation("thumbnailVideo", fields: [thumbnailId], references: [id])
+  thumbnailId String?
 
   status    Status?   @default(PUBLIC)
   deletedAt DateTime?
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
+  File      File?     @relation(fields: [fileId], references: [id])
+  fileId    String?
 }
 
 model Audio {

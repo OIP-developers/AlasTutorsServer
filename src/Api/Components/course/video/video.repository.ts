@@ -1,13 +1,20 @@
 
-// import { Prisma } from '@prisma/client';
-// import Section, { SectionModel } from './Section';
+import { Prisma } from '@prisma/client';
+import Video, { VideoModel } from './video';
 
-export default class SectionRepo {
+export default class VideoRepo {
 
   // public static findById(id: Category['id']) {
-  // public static findById({ where }: { where: Prisma.CategoryWhereUniqueInput }) {
-  //   return CategoryModel.findUnique({ where })
-  // }
+  public static findById(id: Video['id']) {
+    // console.log("whwrw",where)
+    return VideoModel.findUnique({ where:{
+    id
+    } ,
+    include:{
+      media:true
+    }
+  })
+  }
 
   // public static findOne({ where }: { where: Prisma.CategoryWhereInput }) {
   //   return CategoryModel.findFirst({ where: { ...where } })

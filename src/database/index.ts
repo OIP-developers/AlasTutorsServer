@@ -20,6 +20,7 @@ export {
   // ProductCategory,
   Course,
   CourseCategory,
+  Video
   // CourseSubCategory
   
   // ProductImage,

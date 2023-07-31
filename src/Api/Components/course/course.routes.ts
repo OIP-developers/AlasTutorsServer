@@ -20,8 +20,8 @@ export class CourseRoutes {
       '/:id',
       this.controller.getById
     )
-
-
+    
+  
     
     
 
@@ -33,7 +33,7 @@ export class CourseRoutes {
 
     this.router.post(
       '/',
-      // authentication,
+      authentication,
       // authorization([RoleEnum.ADMIN]),
       // validator(schema.create),
       this.controller.create
@@ -59,6 +59,12 @@ export class CourseRoutes {
       // authentication,
       // authorization([RoleEnum.ADMIN]),
       this.controller.delete
+    )
+
+    
+    this.router.get(
+      '/video/:id',
+      this.controller.getVideoById
     )
 
   }

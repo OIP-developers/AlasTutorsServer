@@ -2,6 +2,7 @@
 import { Prisma } from '@prisma/client';
 import Course, { CourseModel } from './Course';
 
+
 export default class CourseRepo {
 
   // public static findById(id: Category['id']) {
@@ -13,7 +14,7 @@ export default class CourseRepo {
   //   return CategoryModel.findFirst({ where: { ...where } })
   // }
 
- 
+
   // public static async findMany<WhereInput, Delegate>(
   //   { Model, where, search, page = '1', limit = '10', fullTextSearch }: {
   //     Model: Delegate,
@@ -84,20 +85,157 @@ export default class CourseRepo {
   // }
 
   public static find(): Promise<Course[] | null> {
-    return CourseModel.findMany({ })
+    return CourseModel.findMany({
+      include: {
+        thumbnail:true,
+        videos: true,
+        createdBy:true
+      }
+    })
   }
 
-  public static async create(course :any) {
-    console.log("course",course)
+  public static async create(course: any) {
+    console.log("course", course)
     return CourseModel.create({
-   data:course
-    });
+      data: {
+        description: course.description,
+        price: course.price,
+        title: course.title,
+        createdById: course.createdById,
+        thumbnailId: course.thumbnailId,
+        bannerId: course.bannerId,
+        currency: course.currency,
+        categoryId: course.categoryId,
+        videos: {
+          create: course.videos.map((video: any): any => {
+            // console.log("mediaId",video.mediaId)
+            // Add courseId to each video, if it's not already present
+            // if (!video.courseId && courseId) {
+            //   video.courseId = courseId;
+            // }
+
+            return {
+              title: video.title,
+              description: video.description,
+              mediaId: video.mediaId,
+              thumbnailId:video.thumbnailId,
+              
+              // mediaId: video.mediaId ? { connect: { id: video.mediaId } } : undefined,
+              // Connect each video to the course using the courseId
+              ...(video.courseId ? { course: { connect: { id: video.courseId } } } : {}),
+            };
+          }),
+        }
+      },
+      include: { videos: true },
+    })
   }
 
-  public static async update(id: Course['id'], course: Prisma.CourseUpdateInput): Promise<Course | null> {
+  // public static async update(id: Course['id'], course: any): Promise<Course | null> {
+  //   return CourseModel.update({
+  //     where: { id },
+  //     data: {
+  //       description: course.description,
+  //       price: course.price,
+  //       title: course.title,
+  //       createdById:course.createdById,
+  //       thumbnailId:course.thumbnailId,
+  //       bannerId:course.bannerId,
+  //       currency:course.currency,
+  //       categoryId:course.categoryId,
+  //       videos: {
+
+  //         updateMany: course.videos.map((video: any): any => {
+
+
+  //           // console.log("mediaId",video.mediaId)
+  //           // Add courseId to each video, if it's not already present
+  //           // if (!video.courseId && courseId) {
+  //           //   video.courseId = courseId;
+  //           // }
+  //           const vId=video.vId
+
+  //           return {
+  //             id:video.vId,
+  //             title: video.title,
+  //             description: video.description,
+  //             mediaId:video.mediaId,
+  //             // mediaId: video.mediaId ? { connect: { id: video.mediaId } } : undefined,
+  //             // Connect each video to the course using the courseId
+  //             // ...(video.courseId ? { course: { connect: { id: video.courseId } } } : {}),
+  //           };
+  //         }),
+  //       }
+  //     },
+  //     include: { videos: true },
+  //   });
+  // }
+
+
+  public static async update(id: Course['id'], course: any): Promise<Course | null> {
     return CourseModel.update({
       where: { id },
-      data:course
+      data: {
+        description: course.description,
+        price: course.price,
+        title: course.title,
+        createdById: course.createdById,
+        thumbnailId: course.thumbnailId,
+        bannerId: course.bannerId,
+        currency: course.currency,
+        categoryId: course.categoryId,
+        videos: {
+          update: course.videos.map((video: any) => ({
+            where: { id: video.vId }, // Assuming 'vId' is the video ID
+            data: {
+              title: video.title,
+              description: video.description,
+              mediaId: video.mediaId,
+            },
+          })),
+        },
+
+
+        // videos: {
+          
+        //   updateMany: {
+        //     where: {course.vid},
+        //     data: {
+        //       title:course.video.title,
+        //       description: course.video.description,
+        //       mediaId: course.video.mediaId,
+        //     }
+        //   }
+        //   // updateMany:course.videos.map((video: any): any => {
+
+
+        //   //     // // console.log("mediaId",video.mediaId)
+        //   //     // // Add courseId to each video, if it's not already present
+        //   //     // // if (!video.courseId && courseId) {
+        //   //     // //   video.courseId = courseId;
+        //   //     // // }
+        //   //     // const vId=video.vId
+
+        //   //     // return {
+
+        //   //     //   id:video.vId,
+        //   //     //   title: video.title,
+        //   //     //   description: video.description,
+        //   //     //   mediaId:video.mediaId,
+        //   //     //   // mediaId: video.mediaId ? { connect: { id: video.mediaId } } : undefined,
+        //   //     //   // Connect each video to the course using the courseId
+        //   //     //   // ...(video.courseId ? { course: { connect: { id: video.courseId } } } : {}),
+        //   //     // };
+        //   //   }),
+        // }
+      },
+      include: { 
+        videos:{
+          include:{
+            media:true
+          }
+        }
+      },
     });
   }
   public static async delete(id: Course['id']): Promise<Course | null> {
@@ -109,7 +247,18 @@ export default class CourseRepo {
   public static findById(id: Course['id']): Promise<Course | null> {
     return CourseModel.findUnique({
       where: { id },
-   
+    
+      include:{
+        thumbnail:true,
+        videos:{
+          include:{
+            thumbnail:{
+             
+            }
+          }
+        }
+      }
+
     })
   }
 

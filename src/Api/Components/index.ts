@@ -16,7 +16,7 @@ import { CourseRoutes } from './course/course.routes';
 
 export const registerApiRoutes = (router: Router, prefix: string = ''): void => {
 
-  router.get(prefix, (req: Request, res: Response) => res.send('❤'));
+  router.get(prefix, (req: Request, res: Response) => res.send('Alas Tutor ❤'));
   // router.use(`${prefix}/emaple`, new ExampleRoutes().router)
   // router.use(`${prefix}/category`, new CategoryRoutes().router)
   // router.use(`${prefix}/product`, new ProductRoutes().router)

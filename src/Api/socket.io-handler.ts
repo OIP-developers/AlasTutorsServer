@@ -182,7 +182,7 @@ export class SocketEventHandlers {
       // socket.user_address = message.user_address;
 
       Logger.info(`Ride Id: ${message.riderId} Ride leave from: WAITING_FOR_RIDE`);
-
+ 
       // Add the user to the lobby room
       socket.leave('RIDE_WAITING_ROOM')
       socket.join(`RIDE-${message.rideId}`)

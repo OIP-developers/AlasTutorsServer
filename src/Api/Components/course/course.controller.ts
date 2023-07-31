@@ -5,9 +5,11 @@ import asyncHandler from "../../../helpers/async";
 import { BadRequestError, NoDataError } from '../../../core/ApiError';
 import { SuccessResponse } from '../../../core/ApiResponse';
 import Course, { CourseModel } from './Course'
+import Video ,{VideoModel} from './video/video'
 import { Prisma } from "@prisma/client";
 import { Repository } from '../common/repository'
 import CourseRepo from "./course.repository";
+import VideoRepo from "./video/video.repository";
 
 export class CourseController {
 
@@ -72,7 +74,7 @@ export class CourseController {
 
   create = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-      const { body } = req;
+      const { body ,user} = req;
       console.log("course",body)
       // body.name = body.name.toLowerCase();
       // if (!body.slug) {
@@ -80,9 +82,9 @@ export class CourseController {
       // }
 
    
-
-      const category = await CourseRepo.create(body);
-      new SuccessResponse('create success', { category }).send(res);
+      body.createdById =user.id
+      const course = await CourseRepo.create(body);
+      new SuccessResponse('create success', { course }).send(res);
     }
   )
 
@@ -102,6 +104,7 @@ export class CourseController {
       const { body, params } = req;
       // body.name = body.name.toLowerCase();
       const course= await CourseRepo.update(params.id,body)
+      console.log("body",body)
       new SuccessResponse('update success', { course }).send(res);
     }
   )
@@ -123,4 +126,17 @@ export class CourseController {
 
     }
   )
+
+  getVideoById = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const {user,params} = req;
+      console.log("params.id",params.id)
+
+      const video = await VideoRepo.findById(params.id);
+
+      new SuccessResponse('fetch success', { video }).send(res);
+
+    }
+  )
+
 }
