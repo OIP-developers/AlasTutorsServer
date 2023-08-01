@@ -87,6 +87,7 @@ model User {
   last_name       String?
   phone           Int?
   profile_picture String?
+  imageUrl        String?
   gender          Gender?
   profile         String?
   dateOfBirth     DateTime?
@@ -118,6 +119,7 @@ model User {
   courses    Course[]
   cart       CartItem[]
   orders     Order[]
+  // Reviews    Reviews[]
 }
 
 model File {
@@ -371,3 +373,13 @@ model Invoice {
   createdAt DateTime?     @default(now())
   updatedAt DateTime?     @updatedAt
 }
+
+// model Review {
+//   id          String  @id @default(uuid())
+//   userId      String
+//   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   courseId    String
+//   course      Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+//   reviews     Float
+//   description String?
+// }

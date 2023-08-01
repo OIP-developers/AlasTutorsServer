@@ -1,17 +1,21 @@
 
 import { Prisma } from '@prisma/client';
-import CourseCategory, { CourseCategoryModel } from './Course-Category';
+import CourseReview, {CourseReviewModel } from './courseReview';
 
-export default class CourseCategoryRepo {
+export default class courseReviewRepo {
 
   // public static findById(id: Category['id']) {
-  // public static findById({ where }: { where: Prisma.CategoryWhereUniqueInput }) {
-  //   return CategoryModel.findUnique({ where })
-  // }
+  public static findById(id: CourseReview['id']) {
+    // console.log("whwrw",where)
+    return CourseReviewModel.findUnique({ where:{
+    id
+    } 
+  })
+  }
 
-  // public static findOne({ where }: { where: Prisma.CategoryWhereInput }) {
-  //   return CategoryModel.findFirst({ where: { ...where } })
-  // }
+  public static findOne({ where }: { where: Prisma.CourseReviewWhereInput }) {
+    return CourseReviewModel.findFirst({ where: { ...where } })
+  }
 
  
   // public static async findMany<WhereInput, Delegate>(
@@ -76,46 +80,11 @@ export default class CourseCategoryRepo {
   //   return CategoryModel.findMany({ where: { isDeleted: false }, orderBy: { createdAt: 'desc' } })
   // }
 
-  public static async create(courseCategory:any) {
-    return CourseCategoryModel.create({
-    data:courseCategory
+  public static async create({ review }: { review: Prisma.CourseReviewCreateInput }) {
+    console.log("review",review)
+    return CourseReviewModel.create({
+      data: { ...review, }
     });
-  }
-
-
-  public static find(): Promise<CourseCategory[] | null> {
-    return CourseCategoryModel.findMany({ })
-  }
-  public static async update(id: CourseCategory['id'], courseCategory: Prisma.CourseCategoryUpdateInput): Promise<CourseCategory | null> {
-    return CourseCategoryModel.update({
-      where: { id },
-      data:courseCategory
-    });
-  }
-
-  public static async delete(id: CourseCategory['id']): Promise<CourseCategory | null> {
-    return CourseCategoryModel.delete({
-      where: { id }
-    });
-  }
-
-  public static findById(id: CourseCategory['id']): Promise<any | null> {
-    return CourseCategoryModel.findUnique({
-      where: { id },
-    
-      select:{
-        // id:true,
-        courses:{
-          include:{
-            thumbnail:true
-          }
-        },
-    
-
-
-      }
-   
-    })
   }
 
   // public static async statusUpdate({ id, status }: { id: Category['id'], status: Prisma.CategoryUpdateInput }) {
@@ -126,22 +95,30 @@ export default class CourseCategoryRepo {
   //     }
   //   });
   // }
+  public static find(id:any): Promise<CourseReview[] | null> {
+    return CourseReviewModel.findMany({
+     where:{courseId:id},
+     include:{
+      user:true,
+     }
+    })
+  }
 
-  // public static async update(
-  //   { id, category }: { id: Category['id'], category: Prisma.CategoryUpdateInput }
-  // ) {
-  //   // console.log("--------=====",id,category);
+  public static async update(
+    { id, review }: { id: CourseReview['id'], review: Prisma.CourseReviewUpdateInput }
+  ) {
+    // console.log("--------=====",id,category);
 
-  //   return CategoryModel.update({
-  //     where: { id },
-  //     data: category
-  //   });
-  // }
+    return CourseReviewModel.update({
+      where: { id },
+      data: review
+    });
+  }
 
-  // public static async delete(id: Category['id']) {
-  //   return CategoryModel.delete({
-  //     where: { id }
-  //   });
-  // }
+  public static async delete(id: CourseReview['id']) {
+    return CourseReviewModel.delete({
+      where: { id }
+    });
+  }
 
 }

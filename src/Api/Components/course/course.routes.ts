@@ -61,6 +61,34 @@ export class CourseRoutes {
       this.controller.delete
     )
 
+
+    this.router.post(
+      '/review',
+      authentication,
+      this.controller.createReview
+    )
+    this.router.put(
+      '/review/:id',
+      // authentication,
+      this.controller.updateReview
+    )
+    this.router.get(
+      '/review/:id',
+      // authentication,
+      this.controller.getCourseReviewById
+    )
+    this.router.delete(
+      '/review/:id',
+      // authentication,
+      this.controller.deleteCourseReview
+    )
+    this.router.get(
+      '/review/getall/:id',
+      // authentication,
+      this.controller.getAllCourseReviewByCourseId
+    )
+
+   
     
     this.router.get(
       '/video/:id',

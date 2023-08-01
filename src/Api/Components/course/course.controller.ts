@@ -11,6 +11,9 @@ import { Repository } from '../common/repository'
 import CourseRepo from "./course.repository";
 import VideoRepo from "./video/video.repository";
 
+import courseReviewRepo from "./review/courseReview.repository";
+
+
 export class CourseController {
 
 
@@ -102,6 +105,7 @@ export class CourseController {
   update = asyncHandler(
     async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
       const { body, params } = req;
+         console.log("body",body)
       // body.name = body.name.toLowerCase();
       const course= await CourseRepo.update(params.id,body)
       console.log("body",body)
@@ -139,4 +143,61 @@ export class CourseController {
     }
   )
 
+  createReview = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { body ,user} = req;
+      console.log("course",body)
+      // body.name = body.name.toLowerCase();
+      // if (!body.slug) {
+      //   body.slug = body.name.slice(0, 2) + "-" + Math.floor((Math.random() * 10000) + 1);
+      // }
+      body.userId=user.id
+      console.log("body",body)
+
+      const review = await courseReviewRepo.create({review:body})
+      new SuccessResponse('create success', { review }).send(res);
+    }
+  )
+
+  updateReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { body, params } = req;
+         console.log("body",body)
+      // body.name = body.name.toLowerCase();
+      const course= await courseReviewRepo.update({id:params.id,review:body})
+      console.log("body",body)
+      new SuccessResponse('update success', { course }).send(res);
+    }
+  )
+  getCourseReviewById = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const {user,parms} = req;
+
+      const course = await courseReviewRepo.findById(req.params.id);
+
+      new SuccessResponse('fetch success', { course }).send(res);
+
+    }
+    
+  )
+
+  getAllCourseReviewByCourseId = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const {user,parms} = req;
+
+      const reviews = await courseReviewRepo.find(req.params.id);
+
+      new SuccessResponse('fetch success', { reviews }).send(res);
+
+    }
+    
+  )
+
+  deleteCourseReview = asyncHandler(
+    async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { params } = req;
+      const category = await courseReviewRepo.delete(params.id);
+      new SuccessResponse('delete success', { category }).send(res);
+    }
+  )
 }
