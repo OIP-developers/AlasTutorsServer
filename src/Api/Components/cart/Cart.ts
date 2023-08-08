@@ -1,7 +1,7 @@
-// import { prisma, IPrisma, Cart } from '../../../database';
+import { prisma, IPrisma, Cart } from '../../../database';
 
-// export const DOCUMENT_NAME = IPrisma.ModelName.Cart;
+export const DOCUMENT_NAME = IPrisma.ModelName.Cart;
 
-// export default Cart;
+export default Cart;
 
-// export const CartModel = prisma.cart;
+export const CartModel = prisma.cart;

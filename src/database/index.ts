@@ -16,12 +16,13 @@ export {
   File,
   // Wallet,
   Order,
-  // Cart,
+  Cart,
   // ProductCategory,
   Course,
   CourseCategory,
   Video,
-  CourseReview
+  CourseReview,
+  // CartItem
   // CourseSubCategory
   
   // ProductImage,

@@ -9,6 +9,7 @@ import { FileRoutes } from './Upload/file.routes';
 // import { CartRoutes } from './cart/cart.routes';
 import { CourseCategoryRoutes } from './course-category/course-category.routes';
 import { CourseRoutes } from './course/course.routes';
+import { CartRoutes } from './cart/cart.routes';
 // import { InvoiceRoutes } from './invoice/invoice.routes'
 
 // import { SubscriptionRoutes } from './subscription/subscription.routes'
@@ -27,6 +28,7 @@ export const registerApiRoutes = (router: Router, prefix: string = ''): void => 
   // router.use(`${prefix}/course`, new CartRoutes().router)
   router.use(`${prefix}/course-category`, new CourseCategoryRoutes().router)
   router.use(`${prefix}/course`, new CourseRoutes().router)
+  router.use(`${prefix}/cart`, new CartRoutes().router)
 
   
   

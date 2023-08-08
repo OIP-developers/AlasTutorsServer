@@ -16,10 +16,10 @@ export default class UserRepo {
     })
   }
 
-  public static findUsers(): Promise<User[] | null> {
+  public static findUsers(role:any): Promise<User[] | null> {
     return UserModel.findMany({
       where: {
-        role: { code: "STUDENT" }
+        role: { code: role }
       },
       include: {
         role: {

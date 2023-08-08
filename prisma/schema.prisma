@@ -117,9 +117,12 @@ model User {
   reviews    CourseReview[]
   files      File[]
   courses    Course[]
-  cart       CartItem[]
+  // cart       CartItem[]
   orders     Order[]
   // Reviews    Reviews[]
+  // Video      Video[]
+
+  Cart Cart[]
 }
 
 model File {
@@ -253,6 +256,7 @@ model Course {
   tags       Tag[]
   cartItems  CartItem[]
   OrderItems OrderItems[]
+  Cart       Cart[]
 }
 
 model Tag {
@@ -282,6 +286,9 @@ model Video {
 
   thumbnail   File?   @relation("thumbnailVideo", fields: [thumbnailId], references: [id])
   thumbnailId String?
+
+  // userId String?
+  // user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   status    Status?   @default(PUBLIC)
   deletedAt DateTime?
@@ -313,8 +320,8 @@ model Audio {
 model CartItem {
   id String @id @default(uuid())
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
+  // user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // userId String
 
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String
@@ -373,6 +380,32 @@ model Invoice {
   createdAt DateTime?     @default(now())
   updatedAt DateTime?     @updatedAt
 }
+
+model Cart {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+
+  // quantity Int?
+
+  isDeleted Boolean?  @default(false)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+// model VideoLock {
+//   id String @id @default(uuid())
+
+//   userId String
+//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   videoId String
+//   video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+// }
 
 // model Review {
 //   id          String  @id @default(uuid())

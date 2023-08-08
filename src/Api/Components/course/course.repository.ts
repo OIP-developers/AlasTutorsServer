@@ -89,7 +89,8 @@ export default class CourseRepo {
       include: {
         thumbnail:true,
         videos: true,
-        createdBy:true
+        createdBy:true,
+    
       }
     })
   }
@@ -184,16 +185,16 @@ export default class CourseRepo {
         bannerId: course.bannerId,
         currency: course.currency,
         categoryId: course.categoryId,
-        videos: {
-          update: course.videos.map((video: any) => ({
-            where: { id: video.vId }, // Assuming 'vId' is the video ID
-            data: {
-              title: video.title,
-              description: video.description,
-              mediaId: video.mediaId,
-            },
-          })),
-        },
+        // videos: {
+        //   update: course.videos.map((video: any) => ({
+        //     where: { id: video.vId }, // Assuming 'vId' is the video ID
+        //     data: {
+        //       title: video.title,
+        //       description: video.description,
+        //       mediaId: video.mediaId,
+        //     },
+        //   })),
+        // },
 
 
         // videos: {
@@ -229,13 +230,13 @@ export default class CourseRepo {
         //   //   }),
         // }
       },
-      include: { 
-        videos:{
-          include:{
-            media:true
-          }
-        }
-      },
+      // include: { 
+      //   videos:{
+      //     include:{
+      //       media:true
+      //     }
+      //   }
+      // },
     });
   }
   public static async delete(id: Course['id']): Promise<Course | null> {

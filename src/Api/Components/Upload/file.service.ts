@@ -60,7 +60,8 @@ export class FileService {
     region: this.region,
     credentials: {
       accessKeyId: this.accessKeyId,
-      secretAccessKey: this.secretAccessKey
+      secretAccessKey: this.secretAccessKey,
+      
     }
   });
 
@@ -313,7 +314,7 @@ export class FileService {
         Key: `${fileModified}`,
         Body: fileStream,
         BucketKeyEnabled: true,
-        ACL: 'public-read'
+        ACL: 'public-read',
       },
     });
 

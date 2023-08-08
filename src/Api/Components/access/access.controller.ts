@@ -199,7 +199,9 @@ export class AccessController {
 
   getUsers = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-      const users = await UserRepo.findUsers();
+      // console.log("data")
+
+      const users = await UserRepo.findUsers(req.query.role);
       new SuccessResponse('fetch success', { users }).send(res);
     }
   )

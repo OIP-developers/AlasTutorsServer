@@ -77,13 +77,17 @@ export class FileController {
       async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
   
         const source = await this.fileService.uploadOnS3({ file: req.files.file })
-        console.log("files Data",req.files)
+       //@ts-ignore
+        console.log("files Data",source.Location.startsWith('h') ? source.Location : `https://${source.Location}`)
   
         const { file } = await FileRepo.create({
           // @ts-ignore
-          private_source_url: source.Location,
+          // private_source_url: `${source.Location}`,
+          private_source_url: source.Location.startsWith('h') ? source.Location : `https://${source.Location}`,
+          
           // @ts-ignore
-          public_source_url: source.Location,
+          // public_source_url: `${source.Location}`,
+          public_source_url: source.Location.startsWith('h') ? source.Location : `https://${source.Location}`,
           size: `${req.files.file.size}`,
           dimensions: `0 x 0`,
           length: "jjjjj",
