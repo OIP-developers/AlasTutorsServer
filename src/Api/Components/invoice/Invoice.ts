@@ -1,4 +1,4 @@
-import { prisma, IPrisma, Invoice, Currency, InvoiceStatus } from '../../../database';
+import { prisma, IPrisma, Invoice } from '../../../database';
 
 export const DOCUMENT_NAME = IPrisma.ModelName.Invoice;
 

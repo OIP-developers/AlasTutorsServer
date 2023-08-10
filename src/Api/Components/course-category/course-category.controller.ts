@@ -36,6 +36,7 @@ export class CourseCategoryController {
   getById = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
       const {user,parms} = req;
+     
 
       const courseCategory= await CourseCategoryRepo.findById(req.params.id);
 

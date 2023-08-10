@@ -14,7 +14,7 @@ export {
   // Product,
   // Example,
   File,
-  // Wallet,
+  Wallet,
   Order,
   Cart,
   // ProductCategory,

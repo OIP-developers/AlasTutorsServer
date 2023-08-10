@@ -28,6 +28,7 @@ export class InvoiceController {
     async (req: any, res: Response, next: NextFunction) => {
 
       const customerId = req.user.stripe_customerId;
+      console.log("customerId",customerId)
 
       const { payment, invoice } = await this.service.paymentIntentCreate({
         body: req.body,
@@ -52,7 +53,8 @@ export class InvoiceController {
         invoice = createdInvoice
 
         if (createdInvoice.price) WalletRepo.update(createdInvoice.userId, createdInvoice.price)
-      } else {
+      } 
+      else {
         throw new BadRequestError('Invoice not paid yet!');
       }
 

@@ -100,10 +100,11 @@ export default class CourseCategoryRepo {
   }
 
   public static findById(id: CourseCategory['id']): Promise<any | null> {
+    console.log("params.id",id)
     return CourseCategoryModel.findUnique({
       where: { id },
     
-      select:{
+      include:{
         // id:true,
         courses:{
           include:{

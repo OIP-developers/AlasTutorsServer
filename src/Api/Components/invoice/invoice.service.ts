@@ -3,10 +3,10 @@ import { BadRequestError } from '../../../core/ApiError';
 import { StripeCred } from "../../../config/globals"
 import UserRepo from '../access/user.repository'
 import User, { DOCUMENT_NAME as USER_DOCUMENT_NAME } from "../access/User"
-import Product, { ProductModel } from '../product/Product'
-import { ProductRepo } from '../product/product.repository'
+// import Product, { ProductModel } from '../product/Product'
+// import { ProductRepo } from '../product/product.repository'
 import Order, { OrderModel } from '../order/Order'
-import OrderRepo from '../order/order.repository'
+// import OrderRepo from '../order/order.repository'
 import InvoiceRepo from './invoice.repository'
 import Logger from '../../../core/Logger';
 import Invoice from './Invoice';
@@ -58,11 +58,12 @@ export class InvoiceService {
     }
 
     let totalAmount = Math.round(Number(Order?.total));
+    console.log("totalAmount",totalAmount)
 
     const payment = await this._paymentIntentCreate({
       currency: 'usd',
       customer: customerId,
-      amount: totalAmount,
+      amount: 200,
       description: "",
     })
 

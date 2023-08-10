@@ -1,70 +1,93 @@
-// import { Router } from 'express';
-// import { OrderController } from './order.controller';
-// import validator, { ValidationSource } from '../../../helpers/validator';
-// import authentication from '../../../middleware/authentication';
-// import authorization from '../../../middleware/authorization';
-// import schema from './schema'
-// import { RoleEnum } from '../roles/Role'
-// export class OrderRoutes {
+import { Router } from "express";
+import { OrderController } from "./order.controller";
+import validator from "../../../helpers/validator";
+import schema from "./schema";
+// import authorization from "../../../middlewares/authorization";
+// import authentication from "../../../middlewares/authentication";
+import { RoleEnum } from "../roles/Role";
+import authentication from "../../../middleware/authentication";
 
-//   readonly router: Router = Router();
-//   readonly controller: OrderController = new OrderController()
+export class OrderRoutes {
+  readonly router: Router = Router();
+  readonly Controller: OrderController = new OrderController();
+  constructor() {
+    this.initRoutes();
+  }
+  initRoutes(): void {
+    this.router.post(
+      "/",
+      authentication,
+      this.Controller.create
+    );
 
-//   constructor() {
-//     this.initRoutes();
-//   }
+    // this.router.get(
+    //   "/",
+    //   authentication,
+    //   this.Controller.getAll
+    // );
 
-//   initRoutes(): void {
+    // this.router.get(
+    //   "/:id",
+    //   authentication,
+    //   this.Controller.getById
+    // );
 
-//     this.router.get(
-//       '/:id',
-//       this.controller.getById
-//     )
+    // this.router.put(
+    //   "/users/place",
+    //   authentication,
+    //   this.Controller.UpdateUserPlaceOrder
+    // );
 
-    
-//     // this.router.get(
-//     //   '/',
-//     //   authentication,
-//     //   authorization([RoleEnum.ADMIN]),
-//     //   // validator(schema.status),
-//     //   this.controller.searchData
-//     // )
+    // this.router.get(
+    //   "/users/checkout",
+    //   authentication,
+    //   this.Controller.getByUserId
+    // );
 
-//     this.router.get(
-//       '/',
-//       this.controller.getAll
-//     )
+    // this.router.put(
+    //   "/status/:id",
+    //   authentication,
+    //   validator(schema.statusUpdate),
+    //   this.Controller.statusUpdate
+    // );
 
-//     this.router.post(
-//       '/',
-//       authentication,
-//       authorization(["STUDENT"]),
-//       validator(schema.create),
-//       this.controller.create
-//     )
+    // this.router.put(
+    //   "/manufacturer/:id",
+    //   authentication,
+    //   validator(schema.manufacturerUpdate),
+    //   this.Controller.updateOrderByManufacturer
+    // );
 
-//     this.router.put(
-//       '/status/:id',
-//       authentication,
-//       authorization([RoleEnum.ADMIN]),
-//       validator(schema.status),
-//       this.controller.statusUpdate
-//     )
+    // this.router.put(
+    //   "/employee/:id",
+    //   authentication,
+    //   validator(schema.employeeUpdate),
+    //   this.Controller.updateOrderByEmployee
+    // );
 
-//     this.router.put(
-//       '/:id',
-//       authentication,
-//       authorization([RoleEnum.ADMIN]),
-//       this.controller.update
-//     )
+    // this.router.put(
+    //   "/customer/:id",
+    //   authentication,
+    //   // authorization([RoleEnum.CUSTOMER]),
+    //   this.Controller.updateOrderByCustomer
+    // );
 
-//     this.router.delete(
-//       '/:id',
-//       authentication,
-//       authorization([RoleEnum.ADMIN]),
-//       this.controller.delete
-//     )
+    // this.router.get(
+    //   "/employee/review",
+    //   authentication,
+    //   this.Controller.reviewManufacturerEdits
+    // );
 
-//   }
+    // this.router.delete(
+    //   "/:id",
+    //   authentication,
+    //   this.Controller.delete
+    // );
 
-// }
+    // this.router.get(
+    //   "/all/vendor",
+    //   authentication,
+    //   this.Controller.getOrderByVendorId
+    // );
+  }
+}
