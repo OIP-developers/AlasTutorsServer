@@ -46,13 +46,13 @@ export class AccessController {
       if (!createdUser) throw new BadRequestError('User creation field!');
       const tokens = await createTokens(createdUser, keystore.primaryKey, keystore.secondaryKey);
 
-      const { token } = await this.tokenService.createToken({
-        shot_code: generateOTP(),
-        token: generateTokenKey(),
-        type: 'PHONE_VERIFY',
-        userId: createdUser.id,
-        expireAt: new Date()
-      } as Token)
+      // const { token } = await this.tokenService.createToken({
+      //   shot_code: generateOTP(),
+      //   token: generateTokenKey(),
+      //   type: 'PHONE_VERIFY',
+      //   userId: createdUser.id,
+      //   expireAt: new Date()
+      // } as Token)
 
       // if (createdUser && createdUser.phone) {
       //   // @ts-ignore
@@ -65,11 +65,9 @@ export class AccessController {
       //   sendMail({ to: createdUser.email, text: link })
       // }
 
-      console.log("Token: ", token)
       new SuccessResponse('Signup Successful', {
         user: _.pick(createdUser, ['id', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
         tokens,
-        token,
       }).send(res);
     }
   )

@@ -16,16 +16,16 @@ export class CourseRoutes {
 
   initRoutes(): void {
 
+    this.router.use(
+      '/views',
+      this.controller.getVideoById
+    )
+
     this.router.get(
       '/:id',
       authentication,
       this.controller.getById
     )
-    
-  
-    
-    
-
 
     this.router.get(
       '/',
@@ -90,8 +90,8 @@ export class CourseRoutes {
       this.controller.getAllCourseReviewByCourseId
     )
 
-   
-    
+
+
     this.router.get(
       '/video/:id',
       this.controller.getVideoById

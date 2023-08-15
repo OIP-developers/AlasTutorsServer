@@ -7,6 +7,7 @@ import KeystoreRepo from './keystore.repository';
 import Keystore from './Keystore';
 import Logger from '../../../core/Logger'
 import { Prisma } from '@prisma/client';
+import slugify from 'slugify';
 
 export default class UserRepo {
 
@@ -131,6 +132,8 @@ export default class UserRepo {
     user.stripe_customerId=''
     // @ts-ignore 
     delete user.role
+
+    user.username = slugify(`${user.first_name}-${user.last_name}`)
 
     const createdUser = await UserModel.create({
       data: { ...user },

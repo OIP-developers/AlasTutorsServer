@@ -75,29 +75,67 @@ model Tokenstore {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Address {
+  line1      String
+  line2      String
+  city       String
+  postalCode String
+  country    String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@id([userId])
+}
+
+// model MedicalHistory {
+
+//   firstName String
+//   lastName String
+
+//   contact String
+//   GP_name String
+
+//   phone String
+//   email String
+
+//   line1      String
+//   line2      String
+//   city       String
+//   postalCode String
+//   country    String
+
+//   medicalConditions Boolean
+//   specialEducationNeeds Boolean
+
+//   typeOfCondition String
+
+//   user   User   @relation(fields: [userId], references: [id])
+//   userId String
+
+//   @@id([userId])
+// }
+
 model User {
-  id                String      @id @default(uuid())
-  email             String?     @unique
-  username          String?     @unique
+  id String @id @default(uuid())
+
+  email    String? @unique
+  username String? @unique
+
   password          String
-  phone_status      PhoneStatus
   stripe_customerId String
 
-  first_name      String?
-  last_name       String?
-  phone           Int?
-  profile_picture String?
-  imageUrl        String?
-  gender          Gender?
-  profile         String?
-  dateOfBirth     DateTime?
+  first_name String?
+  middleName String?
+  last_name  String?
 
-  address   String?
-  city      String?
-  state     String?
-  zipCode   Int?
-  country   String?
-  timezone  String?
+  phone_status    PhoneStatus?
+  phone           String?
+  profile_picture String?
+  gender          Gender?
+  dateOfBirth     DateTime?
+  yearGroup       String?
+
   aboutInfo String?
 
   status     Status?   @default(PUBLIC)
@@ -111,22 +149,22 @@ model User {
   roleId String
   role   Role   @relation(fields: [roleId], references: [id])
 
+  parentId String?
+  parent   User?   @relation("users", fields: [parentId], references: [id])
+
+  childs User[] @relation("users")
+
   invoices   Invoice[]
   Keystore   Keystore[]
   tokenstore Tokenstore[]
   reviews    CourseReview[]
   files      File[]
   courses    Course[]
-  // cart       CartItem[]
   orders     Order[]
-  // Reviews    Reviews[]
-  // Video      Video[]
-
-  Cart   Cart[]
-  Wallet Wallet?
-
-  // AddCourseCart AddCourseCart[]
-  Paid Paid[]
+  Cart       Cart[]
+  Wallet     Wallet?
+  views      View[]
+  address    Address?
 }
 
 model File {
@@ -214,10 +252,10 @@ model CourseReview {
   rating  Float
   comment String
 
-  user   User?   @relation(fields: [userId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
 
-  course   Course? @relation(fields: [courseId], references: [id])
+  course   Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String?
 
   status    Status?   @default(PUBLIC)
@@ -241,6 +279,7 @@ model Course {
   bannerId String?
 
   price    Float
+  discount Float?
   currency Currency? @default(USD)
 
   category   CourseCategory? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -258,11 +297,8 @@ model Course {
   reviews    CourseReview[]
   audios     Audio[]
   tags       Tag[]
-  cartItems  CartItem[]
-  OrderItems OrderItems[]
+  orderItems OrderItems[]
   Cart       Cart[]
-  // AddCourseCart AddCourseCart[]
-  Paid       Paid[]
 }
 
 model Tag {
@@ -271,7 +307,7 @@ model Tag {
   title String
 
   courseId String
-  course   Course @relation(fields: [courseId], references: [id])
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
@@ -284,24 +320,33 @@ model Video {
   title       String
   description String
 
-  course   Course? @relation(fields: [courseId], references: [id])
+  course   Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String?
 
-  media   File?   @relation("media", fields: [mediaId], references: [id])
+  media   File?   @relation("media", fields: [mediaId], references: [id], onDelete: Cascade)
   mediaId String?
 
-  thumbnail   File?   @relation("thumbnailVideo", fields: [thumbnailId], references: [id])
+  thumbnail   File?   @relation("thumbnailVideo", fields: [thumbnailId], references: [id], onDelete: Cascade)
   thumbnailId String?
-
-  // userId String?
-  // user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   status    Status?   @default(PUBLIC)
   deletedAt DateTime?
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
-  File      File?     @relation(fields: [fileId], references: [id])
+  File      File?     @relation(fields: [fileId], references: [id], onDelete: Cascade)
   fileId    String?
+
+  views View[]
+}
+
+model View {
+  video   Video  @relation(fields: [videoId], references: [id])
+  videoId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  @@id([videoId, userId])
 }
 
 model Audio {
@@ -311,10 +356,10 @@ model Audio {
   title       String
   description String
 
-  course   Course? @relation(fields: [courseId], references: [id])
+  course   Course? @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String?
 
-  media   File?   @relation(fields: [mediaId], references: [id])
+  media   File?   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
   mediaId String?
 
   status    Status?   @default(PUBLIC)
@@ -323,24 +368,10 @@ model Audio {
   updatedAt DateTime? @updatedAt
 }
 
-model CartItem {
-  id String @id @default(uuid())
-
-  // user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // userId String
-
-  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  courseId String
-
-  deletedAt DateTime?
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-}
-
 model Order {
   id String @id @default(uuid())
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   sub_total Int?
@@ -365,12 +396,12 @@ model Wallet {
 model OrderItems {
   id String @id @default(uuid())
 
-  order   Order  @relation(fields: [orderId], references: [id])
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId String
 
   price Float
 
-  course   Course @relation(fields: [courseId], references: [id])
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String
 
   isDeleted Boolean?  @default(false)
@@ -405,28 +436,26 @@ model Cart {
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
   courseId String
 
-  // quantity Int?
-
   isDeleted Boolean?  @default(false)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 }
 
-model Paid {
-  id String @id @default(uuid())
+// model Paid {
+//   id String @id @default(uuid())
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
+//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   userId String
 
-  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  courseId String
+//   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+//   courseId String
 
-  // quantity Int?
+//   // quantity Int?
 
-  isDeleted Boolean?  @default(false)
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-}
+//   isDeleted Boolean?  @default(false)
+//   createdAt DateTime? @default(now())
+//   updatedAt DateTime? @updatedAt
+// }
 
 // model AddCourseCart {
 //   userId String

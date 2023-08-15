@@ -22,12 +22,8 @@ export {
   CourseCategory,
   Video,
   CourseReview,
-  // AddCart,
-  // CartItem
-  // CourseSubCategory
+  View,
   
-  // ProductImage,
-  // ProductTag,
 } from '@prisma/client'
 import Logger from '../core/Logger';
 import { env, DATABASE, environment } from '../config/globals';

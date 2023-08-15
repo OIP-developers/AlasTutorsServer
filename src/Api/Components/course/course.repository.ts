@@ -84,14 +84,15 @@ export default class CourseRepo {
   //   });
   // }
 
-  public static find(): Promise<Course[] | null> {
+  public static find({ where, include }: { where: Prisma.CourseWhereInput, include: Prisma.CourseInclude }): Promise<Course[] | null> {
     return CourseModel.findMany({
+      where,
       include: {
         thumbnail:true,
         videos: true,
         createdBy:true,
         Cart:true,
-    
+        ...include
       },
 
     })
@@ -128,6 +129,24 @@ export default class CourseRepo {
               ...(video.courseId ? { course: { connect: { id: video.courseId } } } : {}),
             };
           }),
+        },
+        tags:{
+          create: course.tags.map((tag: any): any => {
+            // console.log("mediaId",video.mediaId)
+            // Add courseId to each video, if it's not already present
+            // if (!video.courseId && courseId) {
+            //   video.courseId = courseId;
+            // }
+
+            return {
+              title: tag,
+             
+              
+              // mediaId: video.mediaId ? { connect: { id: video.mediaId } } : undefined,
+              // Connect each video to the course using the courseId
+              ...(tag.courseId ? { course: { connect: { id: tag.courseId } } } : {}),
+            };
+          })
         }
       },
       include: { videos: true },
@@ -254,14 +273,15 @@ export default class CourseRepo {
       include:{
         thumbnail:true,
         Cart:true,
-        OrderItems:true,
+        orderItems:true,
         videos:{
           include:{
             thumbnail:{
              
             }
           }
-        }
+        },
+        tags:true
       }
 
     })
