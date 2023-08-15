@@ -11,6 +11,7 @@ import Invoice from './Invoice'
 import _ from 'lodash'
 import Logger from '../../../core/Logger';
 import { StripeCred } from '../../../config/globals';
+import CartRepo from '../cart/cart.repository';
 
 export class InvoiceController {
 
@@ -42,7 +43,9 @@ export class InvoiceController {
   )
 
   confirmPaymentIntent = asyncHandler(
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (req: any, res: Response, next: NextFunction) => {
+      const {user} =req
+    
 
       const payment = await this.service.paymentIntentRetrieve(req.params.pi_id)
       if (!payment) throw new BadRequestError('payment intent not found');
@@ -51,16 +54,22 @@ export class InvoiceController {
       if (payment.status === 'succeeded' || true) {
         const { invoice: createdInvoice } = await InvoiceRepo.updateByStripe(payment.id, { status: 'paid' } as Invoice)
         invoice = createdInvoice
+        const data =await CartRepo.deleteManyy(user.id)
+        console.log("data")
+        res.redirect("https://alas-tutors-dashboard.vercel.app/my-cart/success/")
+       
 
-        if (createdInvoice.price) WalletRepo.update(createdInvoice.userId, createdInvoice.price)
+        // if (createdInvoice.price) WalletRepo.update(createdInvoice.userId, createdInvoice.price)
       } 
       else {
         throw new BadRequestError('Invoice not paid yet!');
       }
 
-      new SuccessResponse('payment intent successful', {
-        invoice,
-      }).send(res);
+      
+
+      // new SuccessResponse('payment intent successful', {
+      //   invoice,
+      // }).send(res);
     }
   )
 

@@ -90,8 +90,10 @@ export default class CourseRepo {
         thumbnail:true,
         videos: true,
         createdBy:true,
+        Cart:true,
     
-      }
+      },
+
     })
   }
 
@@ -251,6 +253,8 @@ export default class CourseRepo {
     
       include:{
         thumbnail:true,
+        Cart:true,
+        OrderItems:true,
         videos:{
           include:{
             thumbnail:{

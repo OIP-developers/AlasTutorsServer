@@ -124,6 +124,9 @@ model User {
 
   Cart   Cart[]
   Wallet Wallet?
+
+  // AddCourseCart AddCourseCart[]
+  Paid Paid[]
 }
 
 model File {
@@ -258,6 +261,8 @@ model Course {
   cartItems  CartItem[]
   OrderItems OrderItems[]
   Cart       Cart[]
+  // AddCourseCart AddCourseCart[]
+  Paid       Paid[]
 }
 
 model Tag {
@@ -363,7 +368,7 @@ model OrderItems {
   order   Order  @relation(fields: [orderId], references: [id])
   orderId String
 
-  price Int
+  price Float
 
   course   Course @relation(fields: [courseId], references: [id])
   courseId String
@@ -376,7 +381,7 @@ model OrderItems {
 model Invoice {
   id       String   @id @default(uuid())
   stripe   String   @unique
-  price    Int
+  price    Float
   currency Currency
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -406,6 +411,32 @@ model Cart {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 }
+
+model Paid {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId String
+
+  // quantity Int?
+
+  isDeleted Boolean?  @default(false)
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+// model AddCourseCart {
+//   userId String
+//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   courseId String
+//   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+//   @@id([userId, courseId])
+// }
 
 // model OrderItems {
 //   id String @id @default(uuid())

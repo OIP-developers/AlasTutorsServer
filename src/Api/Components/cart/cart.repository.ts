@@ -5,12 +5,17 @@ import User, { UserModel } from '../../../Api/Components/access/User';
 import { includes } from 'lodash';
 
 export default class CartRepo {
-  public static async create({ data }: { data: Prisma.CartUncheckedCreateInput; }) {
+  public static async create({ data }: { data: any; }) {
     return CartModel.create({
       data: {
         userId: data.userId,
         courseId: data.courseId,
-        // quantity: data.quantity
+      
+      // AddCart:{
+      //   create:{
+      
+      //   }
+      // }
       }
     });
   }
@@ -127,6 +132,11 @@ export default class CartRepo {
   }
 
   public static async deleteMany(userId: Cart['userId']) {
+    return CartModel.deleteMany({
+      where: { userId }
+    });
+  }
+  public static async deleteManyy(userId: Cart['userId']) {
     return CartModel.deleteMany({
       where: { userId }
     });

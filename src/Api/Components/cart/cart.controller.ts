@@ -4,6 +4,7 @@ import CartRepo from './cart.repository';
 import { BadRequestError, NoDataError } from '../../../core/ApiError';
 import { SuccessResponse } from '../../../core/ApiResponse';
 import Cart, { CartModel } from './Cart'
+// import AddCartRepo from "./addCart/addCart.repository";
 
 export class CartController {
 
@@ -52,6 +53,11 @@ export class CartController {
       const { body, user } = req;
       body.userId = user.id
       const entity = await CartRepo.create({ data: body });
+      //@ts-ignore
+      // body.cartId  = entity.id
+      // const addCart =await AddCartRepo.create(user.id,entity.id)
+      // console.log("entity",entity)
+      // console.log("addCart",addCart)
       new SuccessResponse('create success', { entity }).send(res);
     }
   )

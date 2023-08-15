@@ -22,6 +22,7 @@ export {
   CourseCategory,
   Video,
   CourseReview,
+  // AddCart,
   // CartItem
   // CourseSubCategory
   

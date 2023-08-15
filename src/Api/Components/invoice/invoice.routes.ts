@@ -23,7 +23,7 @@ export class InvoiceRoutes {
     );
 
     this.router.get('/payment_intents/confirm/:pi_id',
-      // authentication,
+      authentication,
       this.controller.confirmPaymentIntent
     );
 

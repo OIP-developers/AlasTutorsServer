@@ -67,8 +67,20 @@ export class CourseController {
   getAll = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
       const user = req.user;
+      console.log("req.user.id",user)
 
-      const course = await CourseRepo.find();
+      const courses = await CourseRepo.find();
+      const course = courses?.map((course:any) => {
+        //@ts-ignore
+        console.log("course",course)
+        //@ts-ignore
+       
+        const isCart = course.Cart.find((like) => like.userId === req.user.id)
+        return {
+          isCart: isCart ? true : false,
+          ...course
+        }
+      })
 
       new SuccessResponse('fetch success', { course}).send(res);
 
@@ -125,6 +137,18 @@ export class CourseController {
       const {user,parms} = req;
 
       const course = await CourseRepo.findById(req.params.id);
+      //@ts-ignore
+      const Cart = course.Cart.find((subs) => subs.userId === req.user.id)
+      // console.log("isCart",isCart)
+    //   console.log("isSubscribed",isSubscribed);
+
+    // //   return {
+    // //     isSubscribed: isSubscribed ? true : false,
+    // //     ...channel
+    // //   }
+    // // })
+    //@ts-ignore
+    course.isCart= Cart ? true : false
 
       new SuccessResponse('fetch success', { course }).send(res);
 

@@ -18,6 +18,7 @@ export class CourseRoutes {
 
     this.router.get(
       '/:id',
+      authentication,
       this.controller.getById
     )
     
@@ -28,6 +29,7 @@ export class CourseRoutes {
 
     this.router.get(
       '/',
+      authentication,
       this.controller.getAll
     )
 
