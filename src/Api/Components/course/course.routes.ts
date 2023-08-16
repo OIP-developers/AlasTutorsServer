@@ -22,6 +22,16 @@ export class CourseRoutes {
     )
 
     this.router.get(
+      '/public',
+      this.controller.getPublicCourses
+    )
+    this.router.get(
+      '/public/:id',
+      // authentication,
+      this.controller.getByPublicId
+    )
+
+    this.router.get(
       '/:id',
       authentication,
       this.controller.getById
@@ -79,6 +89,13 @@ export class CourseRoutes {
       // authentication,
       this.controller.getCourseReviewById
     )
+
+
+    // this.router.get(
+    //   '/public/course',
+    //   // authentication,
+    //   this.controller.getCoureByCategoryId
+    // )
     this.router.delete(
       '/review/:id',
       // authentication,
