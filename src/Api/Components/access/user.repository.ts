@@ -126,14 +126,18 @@ export default class UserRepo {
 
     user.password = bcrypt.hashSync(user.password || "NotPossible", 10);
     user.roleId = role.id;
-    user.phone_status = 'VERIFIED' // 'VERIFIED'; // 'PENDING'
-    user.gender = 'MALE'
+
     user.createdAt = user.updatedAt = now;
     user.stripe_customerId=''
     // @ts-ignore 
     delete user.role
-
-    user.username = slugify(`${user.first_name}-${user.last_name}`)
+    let username = (`${user.first_name}.${user.last_name}`).toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
+    
+    //to generate a unique username
+    const userCount = UserModel.count();
+    username = username.toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
+    username = `{$username}.${userCount}`;
+    user.username = slugify(username);
 
     const createdUser = await UserModel.create({
       data: { ...user },

@@ -15,59 +15,48 @@ import KeystoreRepo from './keystore.repository';
 import { TokenService } from '../token/token.service'
 import Token from '../token/Token'
 import { comparePassword } from "../../../utils/password";
+import { AccessService } from "./access.service";
 // import { AccessService } from './access.service'
 import { generateCode } from '../../../helpers/generate';
 // import { sendMail } from "../../../utils/email";
 // import JWT from '../../../core/JWT';
 // import { validateTokenData, createTokens, getAccessToken } from '../../../utils/authUtils';
-
+import Guardian from "./Guardian";
 export class AccessController {
 
   private tokenService: TokenService = new TokenService()
+  private readonly accessService = new AccessService()
   // readonly service: AccessService = new AccessService()
 
 
 
   signup = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-      const user = await UserRepo.findByEmail(req.body.email);
+      const { student, parent, guardians , emergency_contact, student_medical = null} = req.body;
+      // if parent email is already registered
+      const user = await UserRepo.findByEmail(parent.email);
       if (user) throw new BadRequestError('User already registered');
-      // if (user && user.email) throw new BadRequestError('User already registered');
 
-      const accessTokenKey = generateTokenKey();
-      const refreshTokenKey = generateTokenKey();
+      const { user: parentUser } = await this.accessService.createParent(parent , emergency_contact);
+      const { user: studentUser } = await this.accessService.createStudent(student,student_medical,parentUser.id);
 
-      const { user: createdUser, keystore } = await UserRepo.create(
-        req.body as User,
-        accessTokenKey,
-        refreshTokenKey,
-        req.body.role,
-      );
-      if (!createdUser) throw new BadRequestError('User creation field!');
-      const tokens = await createTokens(createdUser, keystore.primaryKey, keystore.secondaryKey);
+      //check the guardian type is unique for each student
+      const guardiansType = ["MOTHER", "FATHER", "OTHER"]
+      const allGuardians: Guardian[] = [];
+      guardians.forEach((guardian: Guardian) => {
+        const guardianIndex = guardiansType.findIndex((g) => guardian.type === g);
+        if (guardianIndex !== -1) {
+          guardiansType.splice(guardianIndex, 1);
+          allGuardians.push({ ...guardian, userId: studentUser.id });
+        }
+      });
 
-      // const { token } = await this.tokenService.createToken({
-      //   shot_code: generateOTP(),
-      //   token: generateTokenKey(),
-      //   type: 'PHONE_VERIFY',
-      //   userId: createdUser.id,
-      //   expireAt: new Date()
-      // } as Token)
-
-      // if (createdUser && createdUser.phone) {
-      //   // @ts-ignore
-      //   console.log({ to: createdUser.phone, text: token?.shot_code });
-      // }
-
-      // let link = `http://52.192.208.76/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
-      // if (createdUser && createdUser.email) {
-      //   // @ts-ignore
-      //   sendMail({ to: createdUser.email, text: link })
-      // }
+      //creating guardians
+      await this.accessService.createGuardians(allGuardians);
 
       new SuccessResponse('Signup Successful', {
-        user: _.pick(createdUser, ['id', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
-        tokens,
+        parent: _.pick(parentUser, ['id', 'username', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
+        student: _.pick(studentUser, ['id', 'username', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
       }).send(res);
     }
   )
@@ -365,8 +354,8 @@ export class AccessController {
         // @ts-ignore
         // sendMail({ subject: 'iPrint (Forgot Password)', to: user.email, text: link })
       }
-      console.log("==== link ====",link);
-      
+      console.log("==== link ====", link);
+
       new SuccessMsgResponse('Email send success, Check your email').send(res);
     }
   )
@@ -413,6 +402,6 @@ export class AccessController {
     }
   )
 
-  
+
 
 }

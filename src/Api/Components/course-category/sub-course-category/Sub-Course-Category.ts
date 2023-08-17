@@ -1,7 +1,7 @@
-import { prisma, IPrisma, CourseSubCategory } from '../../../../database';
+// import { prisma, IPrisma, CourseSubCategory } from '../../../../database';
 
-export const DOCUMENT_NAME = IPrisma.ModelName.CourseSubCategory;
+// export const DOCUMENT_NAME = IPrisma.ModelName.CourseSubCategory;
 
-export default CourseSubCategory;
+// export default CourseSubCategory;
 
-export const CourseSubCategoryModel = prisma.courseSubCategory;
+// export const CourseSubCategoryModel = prisma.courseSubCategory;

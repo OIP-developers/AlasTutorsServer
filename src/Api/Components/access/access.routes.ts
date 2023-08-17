@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { AccessController } from './access.controller';
 import validator, { ValidationSource } from '../../../helpers/validator';
-import { signupSchema, userCredential, driverSignupSchema, refreshToken, authBearerSchema, verifyPassword } from "../../../utils/joi.schema"
+import { signupSchema, userCredential, driverSignupSchema, refreshToken, authBearerSchema, verifyPassword , signUpSchema } from "../../../utils/joi.schema"
 import authentication from '../../../middleware/authentication';
 import authorization from '../../../middleware/authorization';
 import schema from './schema';
@@ -20,7 +20,7 @@ export class AccessRoutes {
 
     this.router.post(
       '/signup',
-      // validator(signupSchema),
+      validator(signUpSchema),
       this.controller.signup
     )
 

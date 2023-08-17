@@ -23,6 +23,10 @@ export {
   Video,
   CourseReview,
   View,
+  Address,
+  Guardian,
+  MedicalCondition,
+  EmergencyContact
   
 } from '@prisma/client'
 import Logger from '../core/Logger';
