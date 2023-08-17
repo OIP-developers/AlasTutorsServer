@@ -124,7 +124,12 @@ export default class UserRepo {
     const role = await RoleRepo.findByCode(roleCode)
     if (!role) throw new InternalError('Role must be defined in db!');
 
-    user.password = bcrypt.hashSync(user.password || "NotPossible", 10);
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    if(!user.password){
+      //generating random password
+      user.password = Array.from({ length:8 }, () => charset[Math.floor(Math.random() * charset.length)]).join('');
+    }
+    const password = bcrypt.hashSync(user.password, 10);
     user.roleId = role.id;
 
     user.createdAt = user.updatedAt = now;
@@ -134,13 +139,13 @@ export default class UserRepo {
     let username = (`${user.first_name}.${user.last_name}`).toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
     
     //to generate a unique username
-    const userCount = UserModel.count();
+    const userCount = await UserModel.count();
     username = username.toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
-    username = `{$username}.${userCount}`;
+    username = `${username}.${userCount}`;
     user.username = slugify(username);
-
+    console.log(user)
     const createdUser = await UserModel.create({
-      data: { ...user },
+      data: { ...user , password},
       include: {
         role: {
           select: {

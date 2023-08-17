@@ -103,12 +103,12 @@ model Address {
 }
 
 model EmergencyContact {
-  firstName       String
-  lastName        String
+  first_name       String
+  last_name        String
   phone           String
   emergency_phone String
   email           String?
-  gpName          String
+  gp_name          String
   line1           String
   line2           String
   city            String

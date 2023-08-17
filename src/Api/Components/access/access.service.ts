@@ -52,14 +52,11 @@ export class AccessService {
     const accessTokenKey = generateTokenKey();
     const refreshTokenKey = generateTokenKey();
 
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let password = Array.from({ length:8 }, () => charset[Math.floor(Math.random() * charset.length)]).join('');
     
     const data = {
       ...userData,
       stripe_customerId: "",
       email: `${parentId}.${userData.first_name}`, // auto generated for student
-      password,
       parentId,
     };
 
