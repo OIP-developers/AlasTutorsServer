@@ -2,7 +2,7 @@ import Joi from 'joi';
 import { JoiAuthBearer, JoiUrlEndpoint } from '../helpers/validator';
 
 export const userCredential = Joi.object().keys({
-  email: Joi.string().required().email(),
+  username: Joi.string().required(),
   password: Joi.string().required().min(6),
 })
 
@@ -65,4 +65,74 @@ export const apiKeySchema = Joi.object().keys({
 export const authBearerSchema = Joi.object().keys({
   authorization: JoiAuthBearer().required(),
 }).unknown(true)
+
+
+export const signUpSchema = Joi.object({
+  student: Joi.object({
+    first_name: Joi.string().required(),
+    middle_name: Joi.string().required(),
+    last_name: Joi.string().required(),
+    gender: Joi.string().valid('MALE', 'FEMALE', 'OTHER').required(),
+    isPromotionAllowed: Joi.boolean(),
+    isSpecialEducationNeeds: Joi.boolean(),
+    dateOfBirth: Joi.string().required(),
+    yearGroup: Joi.string().required(),
+  }).required().custom((student, helpers) => {
+    const splittedDob = student.dateOfBirth.split("-");
+    if (splittedDob.length !== 3) {
+      return helpers.error('Invalid date of birth');
+    }
+    const dob = new Date(student.dateOfBirth);
+    if (!(dob instanceof Date) || dob.getTime() > Date.now()) {
+      return helpers.error("Invalid Date")
+    }
+    return student;
+  }, 'custom date of birth validation'),
+  guardians: Joi.array().items(Joi.object({
+    first_name: Joi.string().required(),
+    middle_name: Joi.string(),
+    last_name: Joi.string().required(),
+    type: Joi.string().valid('MOTHER', 'FATHER', 'OTHER').required()
+  })).custom((value, helpers) => {
+    const types = value.map((guardian: { type: string }) => guardian?.type);
+    const uniqueTypes = [...new Set(types)]; // Remove duplicate types
+    if (uniqueTypes.length !== types.length) {
+      return helpers.error('Duplicate guardian type');
+    };
+  }, 'UniqueTypesValidator'),
+
+  parent: Joi.object({
+    first_name: Joi.string().required(),
+    middle_name: Joi.string().required(),
+    last_name: Joi.string().required(),
+    phone: Joi.string().required(),
+    email: Joi.string().email().required(),
+    signature: Joi.string().required(),
+    address: Joi.object({
+      line1: Joi.string().required(),
+      line2: Joi.string().required(),
+      city: Joi.string().required(),
+      postalCode: Joi.string().required(),
+      country: Joi.string().required(),
+    })
+  }).required(),
+  emergency_contact: Joi.object({
+    first_name: Joi.string().required(),
+    last_name: Joi.string().required(),
+    emergency_phone: Joi.string().required(),
+    gp_name: Joi.string().required(),
+    phone: Joi.string().required(),
+    email: Joi.string().email(),
+    line1: Joi.string().required(),
+    line2: Joi.string().required(),
+    city: Joi.string().required(),
+    postalCode: Joi.string().required(),
+    country: Joi.string().required(),
+  }),
+  student_medical: Joi.object({
+    isMedicalConditions: Joi.boolean(),
+    typeOfCondition: Joi.string(),
+    medicationGiven: Joi.string()
+  })
+});
 
