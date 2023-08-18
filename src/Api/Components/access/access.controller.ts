@@ -41,14 +41,11 @@ export class AccessController {
       const { user: studentUser } = await this.accessService.createStudent(student,student_medical,parentUser.id);
 
       //check the guardian type is unique for each student
-      const guardiansType = ["MOTHER", "FATHER", "OTHER"]
-      const allGuardians: Guardian[] = [];
-      guardians.forEach((guardian: Guardian) => {
-        const guardianIndex = guardiansType.findIndex((g) => guardian.type === g);
-        if (guardianIndex !== -1) {
-          guardiansType.splice(guardianIndex, 1);
-          allGuardians.push({ ...guardian, userId: studentUser.id });
-        }
+      const allGuardians = guardians.map((guardian:Guardian)=>{
+          return {
+            ...guardian,
+              userId: studentUser.id
+          }
       });
 
       //creating guardians
@@ -107,13 +104,19 @@ export class AccessController {
   signin = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
 
-      const user = await UserRepo.findByEmail(req.body.email);
+      const user = await UserRepo.findByUsername(req.body.username);
       console.log('====================================');
       console.log(user);
       console.log('====================================');
       if (!user) throw new BadRequestError('Invalid credentials');
       if (!user.password) throw new BadRequestError('Credential not set');
       if (!user.status) throw new BadRequestError('User InActive');
+
+      const isValidPassword = await comparePassword(req.body.password, user.password);
+      if(!isValidPassword){
+        console.log("HELLO")
+        throw new BadRequestError('Invalid credentials!');
+      }
 
       if (user.phone_status !== "VERIFIED") {
         const { token } = await this.tokenService.createToken({
@@ -133,15 +136,11 @@ export class AccessController {
         throw new BadRequestError('please verify your phone!');
       }
 
-      comparePassword(req.body.password, user.password)
-
+      
       const accessTokenKey = generateTokenKey();
       const refreshTokenKey = generateTokenKey();
-
       await KeystoreRepo.create(user.id, accessTokenKey, refreshTokenKey);
-
       const tokens = await createTokens(user, accessTokenKey, refreshTokenKey);
-
       new SuccessResponse('Login Success', {
         user: _.pick(user, ['id', 'first_name', 'last_name', 'email', 'profile_picture', 'role', 'phone_status', 'profilePicUrl', 'gender']),
         tokens: tokens,

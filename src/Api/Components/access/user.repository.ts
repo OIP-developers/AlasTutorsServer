@@ -113,6 +113,20 @@ export default class UserRepo {
     })
   }
 
+  public static findByUsername(username: string): Promise<User | null> {
+    return UserModel.findFirst({
+      where: { username },
+      include: {
+        role: {
+          select: {
+            id: true,
+            code: true
+          }
+        },
+      }
+    })
+  }
+
   public static async create(
     user: User,
     accessTokenKey: string,
