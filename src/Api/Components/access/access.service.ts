@@ -7,6 +7,8 @@ import Address, { AddressModel } from './Address';
 import Guardian, { GuardianModel } from "./Guardian"
 import MedicalCondition, { MedicalConditionModel } from "./MedicalCondition"
 import EmergencyContact, { EmergencyContactModel } from "./EmergencyContact";
+import Student, { StudentModel } from './Student';
+
 interface ParentAddress {
   address: Address
 }
@@ -48,41 +50,27 @@ export class AccessService {
     return { user, tokens }
   }
 
-  async createStudent(userData: User, medicalCondition: MedicalCondition | null, parentId: string) {
-    const accessTokenKey = generateTokenKey();
-    const refreshTokenKey = generateTokenKey();
-
-    
+  async createStudent(userData: Student, medicalCondition: MedicalCondition | null, parentId: string) {
     const data = {
       ...userData,
-      stripe_customerId: "",
-      email: `${parentId}.${userData.first_name}`, // auto generated for student
       parentId,
     };
 
     if (userData.dateOfBirth) {
       data.dateOfBirth = new Date(userData.dateOfBirth);
     }
-
-    const { user, keystore } = await UserRepo.create(
-      data,
-      accessTokenKey,
-      refreshTokenKey,
-      "STUDENT",
-    );
-    if (!user) throw new BadRequestError('Student creation field!');
-    const tokens = await createTokens(user, keystore.primaryKey, keystore.secondaryKey);
-
+    const student = await StudentModel.create({data:userData});
+    
     if (medicalCondition) {
       const medical = await MedicalConditionModel.create({
         data: {
           ...medicalCondition,
-          userId: user.id
+          studentId: student.id
         }
       })
       if (!medical) throw new BadRequestError('Medical condition creation field!');
     }
-    return { user, tokens }
+    return { student }
   }
 
   async createGuardians(guardians: Guardian[]) {

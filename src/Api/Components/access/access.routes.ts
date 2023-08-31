@@ -53,7 +53,7 @@ export class AccessRoutes {
 
     this.router.get(
       '/users',
-      // authentication,
+      authentication,
       // authorization(["COMPANY_ADMIN", "ADMIN"]),
       this.controller.getUsers
     )

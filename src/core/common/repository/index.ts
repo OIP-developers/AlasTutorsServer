@@ -1,3 +1,4 @@
+import { GetResult } from "@prisma/client/runtime";
 
 export abstract class BaseRepository<ModelType> {
 
@@ -14,7 +15,8 @@ export abstract class BaseRepository<ModelType> {
       }
       throw new Error("Model not initialized");
     } catch (error) {
-      console.error("Repository operation failed:", error);
+      console.log(error);
+      throw error;
       return null;
     }
   }
@@ -40,7 +42,16 @@ export abstract class BaseRepository<ModelType> {
     )
   }
 
-  public findUnique<WhereUniqueInput, Include>({ where, include }: { where: WhereUniqueInput, include: Include }) {
+  public findOneOrThrow<WhereInput, Include>({ where, include }: { where: WhereInput, include: Include }) {
+    return this.execute(() =>
+      (this.Model as any).findFirstOrThrow({
+        where,
+        include,
+      })
+    )
+  }
+
+  public findUnique<WhereUniqueInput, Include>({ where, include }: { where: WhereUniqueInput, include: Include }){
     return this.execute(() =>
       (this.Model as any).findUnique({
         where,
@@ -49,7 +60,7 @@ export abstract class BaseRepository<ModelType> {
     )
   }
 
-  public create<CreateInput, Include>({ data, include }: { data: CreateInput, include: Include }) {
+  public create<CreateInput, Include>({ data, include }: { data: CreateInput, include: Include }){
     return this.execute(() =>
       (this.Model as any).create({
         data,
@@ -76,6 +87,18 @@ export abstract class BaseRepository<ModelType> {
       })
     )
   }
+
+  public upsert<CreateInput, UpdateInput, WhereUniqueInput>({ create , update, where }: { where: WhereUniqueInput, create: CreateInput, update: UpdateInput }) {
+    return this.execute(() =>
+      (this.Model as any).upsert({
+        create,
+        update,
+        where,
+      })
+    )
+  }
+
+  
 
   public updateMany<WhereInput, CreateManyInput>({ where, data }: { where: WhereInput, data: CreateManyInput }) {
     return this.execute(() =>

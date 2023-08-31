@@ -91,11 +91,11 @@ model Tokenstore {
 
 model Address {
   line1      String
-  line2      String
+  line2      String?
   city       String
   postalCode String
   country    String
-  user       User   @relation(fields: [userId], references: [id])
+  user       User    @relation(fields: [userId], references: [id])
   userId     String
 
   @@id([userId])
@@ -109,7 +109,7 @@ model EmergencyContact {
   email           String?
   gp_name         String
   line1           String
-  line2           String
+  line2           String?
   city            String
   postalCode      String
   country         String
@@ -120,13 +120,34 @@ model EmergencyContact {
 }
 
 model MedicalCondition {
-  isMedicalConditions Boolean? @default(false)
+  isMedicalConditions Boolean @default(false)
   typeOfCondition     String?
   medicationGiven     String?
-  user                User     @relation(fields: [userId], references: [id])
-  userId              String
+  studentId           String
+  student             Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-  @@id([userId])
+  @@id([studentId])
+}
+
+model Student {
+  id                      String            @id @default(uuid())
+  first_name              String
+  middle_name             String?
+  last_name               String
+  gender                  Gender
+  dateOfBirth             DateTime
+  yearGroup               String
+  isPromotionAllowed      Boolean           @default(false)
+  isSpecialEducationNeeds Boolean           @default(false)
+  isSiblingEnrolled       Boolean           @default(false)
+  sibling_first_name      String?
+  sibling_last_name       String?
+  deletedAt               DateTime?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime?         @updatedAt
+  parentId                String
+  parent                  User?             @relation(fields: [parentId], references: [id])
+  medicalCondition        MedicalCondition?
 }
 
 model Guardian {
@@ -134,60 +155,28 @@ model Guardian {
   first_name  String?
   middle_name String?
   last_name   String?
+  title       String?
 
   type   GuardianType
   userId String
   user   User         @relation(fields: [userId], references: [id])
 }
 
-// model MedicalHistory {
-
-//   firstName String
-//   lastName String
-
-//   contact String
-//   GP_name String
-
-//   phone String
-//   email String
-
-//   line1      String
-//   line2      String
-//   city       String
-//   postalCode String
-//   country    String
-
-//   medicalConditions Boolean
-//   specialEducationNeeds Boolean
-
-//   typeOfCondition String
-
-//   user   User   @relation(fields: [userId], references: [id])
-//   userId String
-
-//   @@id([userId])
-// }
-
 model User {
   id                String  @id @default(uuid())
   username          String  @unique // auto generate
-  email             String  @unique // auto generated for child (Student)
+  email             String  @unique
   password          String // auto generate
   phone             String?
   stripe_customerId String?
 
-  first_name         String?
-  middle_name        String?
-  last_name          String?
-  profile_picture    String?
-  gender             Gender?
-  dateOfBirth        DateTime?
-  yearGroup          String?
-  dateOfRegistration DateTime? // for parent
-  signature          String?   // for parent
-
-  isPromotionAllowed      Boolean? @default(false)
-  isSpecialEducationNeeds Boolean? @default(false)
+  first_name      String?
+  middle_name     String?
+  last_name       String?
+  profile_picture String?
+  gender          Gender?
+  dateOfBirth     DateTime?
+  yearGroup       String?
 
   status       Status?      @default(PUBLIC)
   emailStatus  EmailStatus? @default(PENDING)
@@ -200,14 +189,10 @@ model User {
   roleId String
   role   Role   @relation(fields: [roleId], references: [id])
 
-  parentId String? // for child (Student)
-  parent   User?   @relation("users", fields: [parentId], references: [id])
+  address          Address?
+  emergencyContact EmergencyContact?
 
-  address          Address? // for parent
-  emergencyContact EmergencyContact? // for parent
-  medicalCondition MedicalCondition? // for child (Student)
-
-  guardians  Guardian[] // for child (Student)
+  guardians  Guardian[]
   invoices   Invoice[]
   keystore   Keystore[]
   tokenstore Tokenstore[]
@@ -218,7 +203,7 @@ model User {
   cart       Cart[]
   wallet     Wallet?
   views      View[]
-  childs     User[]         @relation("users")
+  childs     Student[]
 }
 
 model File {
@@ -479,6 +464,12 @@ model Invoice {
   isDeleted Boolean?      @default(false)
   createdAt DateTime?     @default(now())
   updatedAt DateTime?     @updatedAt
+}
+
+model Sequence {
+  id       String @id @default(uuid())
+  users    Int
+  students Int
 }
 
 model Cart {

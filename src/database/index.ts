@@ -26,8 +26,9 @@ export {
   Address,
   Guardian,
   MedicalCondition,
-  EmergencyContact
-  
+  EmergencyContact,
+  Student,
+
 } from '@prisma/client'
 import Logger from '../core/Logger';
 import { env, DATABASE, environment } from '../config/globals';

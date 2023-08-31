@@ -19,7 +19,7 @@ export class Repository {
       where = {
         ...where,
         OR: fullTextSearch.map((key) => {
-          return { [key]: { contains: search } }
+          return { [key]: { contains: search , mode:"insensitive" } }
         })
       }
     }
