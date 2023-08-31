@@ -203,7 +203,7 @@ model User {
   cart       Cart[]
   wallet     Wallet?
   views      View[]
-  childs     Student[]
+  students     Student[]
 }
 
 model File {

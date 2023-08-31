@@ -1,6 +1,4 @@
 import { Response, Request, NextFunction } from "express"
-// import { Types } from 'mongoose';
-// import crypto from 'crypto';
 import asyncHandler from "../../../helpers/async";
 import UserRepo from './user.repository';
 import { BadRequestError, AuthFailureError } from '../../../core/ApiError';
@@ -21,14 +19,10 @@ import { generateCode } from '../../../helpers/generate';
 // import { sendMail } from "../../../utils/email";
 // import JWT from '../../../core/JWT';
 // import { validateTokenData, createTokens, getAccessToken } from '../../../utils/authUtils';
-import Guardian from "./Guardian";
 export class AccessController {
 
   private tokenService: TokenService = new TokenService()
   private readonly accessService = new AccessService()
-  // readonly service: AccessService = new AccessService()
-
-
 
   signup = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -69,49 +63,6 @@ export class AccessController {
       }).send(res);
     }
   )
-
-  // signupDriver = asyncHandler(
-  //   async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-  //     const user = await UserRepo.findByEmail(req.body.email);
-  //     if (user) throw new BadRequestError('User already registered');
-  //     // if (user && user.email) throw new BadRequestError('User already registered');
-
-  //     const accessTokenKey = generateTokenKey();
-  //     const refreshTokenKey = generateTokenKey();
-
-  //     req.body.referCode = await generateCode(5, 0, 70, '')
-
-  //     const { user: createdUser, keystore } = await UserRepo.create(
-  //       req.body as User,
-  //       accessTokenKey,
-  //       refreshTokenKey,
-  //       "DRIVER",
-  //     );
-
-  //     if (!createdUser) throw new BadRequestError('User creation field!');
-  //     const tokens = await createTokens(createdUser, keystore.primaryKey, keystore.secondaryKey);
-
-  //     const { token } = await this.tokenService.createToken({
-  //       shot_code: generateOTP(),
-  //       token: generateTokenKey(),
-  //       type: 'PHONE_VERIFY',
-  //       userId: createdUser.id,
-  //       expireAt: new Date()
-  //     } as Token)
-
-  //     // let link = `http://52.192.208.76/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
-  //     // if (createdUser && createdUser.email) {
-  //     //   // @ts-ignore
-  //     //   sendMail({ to: createdUser.email, text: link })
-  //     // }
-  //     console.log("Token: ", token)
-  //     new SuccessResponse('Signup Successful', {
-  //       user: _.pick(createdUser, ['id', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
-  //       tokens,
-  //       token
-  //     }).send(res);
-  //   }
-  // )
 
   signin = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {

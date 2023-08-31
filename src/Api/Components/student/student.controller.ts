@@ -16,7 +16,7 @@ export class StudentController {
 
   createStudent = asyncHandler(
     async (req: Request, res: Response): Promise<Response | void> => {
-      const { medicalCondition = null, ...studentData } = req.body;
+      const { medicalCondition = {}, ...studentData } = req.body;
       const student = await this.service.createStudent(req.user?.role?.code, req.user?.id, studentData, medicalCondition)
       new SuccessResponse('Fetch successful', student).send(res);
     }

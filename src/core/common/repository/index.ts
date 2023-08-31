@@ -126,4 +126,12 @@ export abstract class BaseRepository<ModelType> {
     )
   }
 
+  public count<WhereInput>({ where }: { where: WhereInput }) {
+    return this.execute(() =>
+      (this.Model as any).count({
+        where,
+      })
+    )
+  }
+
 }
