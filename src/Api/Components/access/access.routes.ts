@@ -5,7 +5,6 @@ import { signupSchema, userCredential, driverSignupSchema, refreshToken, authBea
 import authentication from '../../../middleware/authentication';
 import authorization from '../../../middleware/authorization';
 import schema from './schema';
-import { RoleEnum } from '../roles/Role';
 
 export class AccessRoutes {
 

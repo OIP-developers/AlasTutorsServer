@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { NotFoundError } from '../../core/ApiError';
-import { AccessRoutes } from './access/access.routes';
+import { AccessRoutes } from './access.v2/access.routes';
 // import { ExampleRoutes } from './example/example.routes';
 // import { CategoryRoutes } from './category/category.routes';
 // import { ProductRoutes } from './product/product.routes';

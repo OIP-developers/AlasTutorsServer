@@ -1,12 +1,11 @@
 import User, { UserModel } from './User';
-import Role, { RoleModel } from '../roles/Role';
+import { Role } from '@prisma/client';
 import RoleRepo from "../roles/role.repository"
 import { InternalError } from '../../../core/ApiError';
 import bcrypt from 'bcrypt';
 import KeystoreRepo from './keystore.repository';
-import Keystore from './Keystore';
 import Logger from '../../../core/Logger'
-import { Prisma, RoleCode } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import slugify from 'slugify';
 import { StudentModel } from './Student';
 export default class UserRepo {
@@ -119,7 +118,7 @@ export default class UserRepo {
             code: true
           }
         },
-        childs: true,
+        students: true,
       }
     })
   }
