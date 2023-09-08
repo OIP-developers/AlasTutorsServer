@@ -5,5 +5,7 @@ export const COLLECTION_NAME = 'roles';
 
 export default Role;
 export const RoleEnum = RoleCode;
-
+export {
+  RoleCode
+}
 export const RoleModel = prisma.role;

@@ -17,15 +17,15 @@ const async_1 = __importDefault(require("../../../helpers/async"));
 const cart_repository_1 = __importDefault(require("./cart.repository"));
 const ApiError_1 = require("../../../core/ApiError");
 const ApiResponse_1 = require("../../../core/ApiResponse");
+// import AddCartRepo from "./addCart/addCart.repository";
 class CartController {
     constructor() {
-        // getAll = asyncHandler(
-        //   async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-        //     const categories = await CartRepo.find({ where: {} });
-        //     if (categories.length === 0) throw new NoDataError();
-        //     new SuccessResponse('fetch success', { categories }).send(res);
-        //   }
-        // )
+        this.getByUser = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            const { user } = req;
+            const entities = yield cart_repository_1.default.find({ where: { userId: user.id } });
+            // if (entities.length === 0) throw new NoDataError();
+            new ApiResponse_1.SuccessResponse('fetch success', { entities }).send(res);
+        }));
         // getAll = asyncHandler(
         //   async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
         //     const { query } = req
@@ -46,14 +46,20 @@ class CartController {
         //   }
         // )
         this.getById = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const entity = yield cart_repository_1.default.findById({ where: { id: req.params.id } });
+            const entity = yield cart_repository_1.default.findById({ id: req.params.id });
             if (!entity)
                 throw new ApiError_1.NoDataError();
             new ApiResponse_1.SuccessResponse('fetch success', { entity }).send(res);
         }));
         this.create = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const { body, user } = req;
-            const entity = yield cart_repository_1.default.create({ body: body, user: user });
+            body.userId = user.id;
+            const entity = yield cart_repository_1.default.create({ data: body });
+            //@ts-ignore
+            // body.cartId  = entity.id
+            // const addCart =await AddCartRepo.create(user.id,entity.id)
+            // console.log("entity",entity)
+            // console.log("addCart",addCart)
             new ApiResponse_1.SuccessResponse('create success', { entity }).send(res);
         }));
         // statusUpdate = asyncHandler(

@@ -1,6 +1,4 @@
 import { Response, Request, NextFunction } from "express"
-// import { Types } from 'mongoose';
-// import crypto from 'crypto';
 import asyncHandler from "../../../helpers/async";
 import UserRepo from './user.repository';
 import { BadRequestError, AuthFailureError } from '../../../core/ApiError';
@@ -15,105 +13,56 @@ import KeystoreRepo from './keystore.repository';
 import { TokenService } from '../token/token.service'
 import Token from '../token/Token'
 import { comparePassword } from "../../../utils/password";
+import { AccessService } from "./access.service";
 // import { AccessService } from './access.service'
 import { generateCode } from '../../../helpers/generate';
 // import { sendMail } from "../../../utils/email";
 // import JWT from '../../../core/JWT';
 // import { validateTokenData, createTokens, getAccessToken } from '../../../utils/authUtils';
-
 export class AccessController {
 
   private tokenService: TokenService = new TokenService()
-  // readonly service: AccessService = new AccessService()
-
-
+  private readonly accessService = new AccessService()
 
   signup = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-      const user = await UserRepo.findByEmail(req.body.email);
+      const { students, parent, emergencyContact } = req.body;
+      const { mother = null, father = null, ...parentData } = parent;
+
+      // if parent email is already registered
+      const user = await UserRepo.findByEmail(parent.email);
       if (user) throw new BadRequestError('User already registered');
-      // if (user && user.email) throw new BadRequestError('User already registered');
 
-      const accessTokenKey = generateTokenKey();
-      const refreshTokenKey = generateTokenKey();
+      const allStudents: any = [];
+      const allGuardians: any = [];
 
-      const { user: createdUser, keystore } = await UserRepo.create(
-        req.body as User,
-        accessTokenKey,
-        refreshTokenKey,
-        req.body.role,
-      );
-      if (!createdUser) throw new BadRequestError('User creation field!');
-      const tokens = await createTokens(createdUser, keystore.primaryKey, keystore.secondaryKey);
+      const { user: parentUser } = await this.accessService.createParent(parentData, emergencyContact);
 
-      // const { token } = await this.tokenService.createToken({
-      //   shot_code: generateOTP(),
-      //   token: generateTokenKey(),
-      //   type: 'PHONE_VERIFY',
-      //   userId: createdUser.id,
-      //   expireAt: new Date()
-      // } as Token)
+      students.forEach(async (student: any) => {
+        const { medicalCondition, ...studentData } = student;
+        const { student: studentUser } = await this.accessService.createStudent({ ...studentData, parentId: parentUser.id }, medicalCondition, parentUser.id);
+        allStudents.push(studentUser)
+      });
 
-      // if (createdUser && createdUser.phone) {
-      //   // @ts-ignore
-      //   console.log({ to: createdUser.phone, text: token?.shot_code });
-      // }
+      if (mother) {
+        allGuardians.push({ ...mother, type: "MOTHER", userId: parentUser.id });
+      }
 
-      // let link = `http://52.192.208.76/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
-      // if (createdUser && createdUser.email) {
-      //   // @ts-ignore
-      //   sendMail({ to: createdUser.email, text: link })
-      // }
+      if (father) {
+        allGuardians.push({ ...father, type: "FATHER", userId: parentUser.id });
+      }
+
+      if (allGuardians.length) {
+        // creating guardians
+        await this.accessService.createGuardians(allGuardians);
+      }
 
       new SuccessResponse('Signup Successful', {
-        user: _.pick(createdUser, ['id', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
-        tokens,
+        parent: _.pick(parent, ['id', 'username', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
+        student: allStudents,
       }).send(res);
     }
   )
-
-  // signupDriver = asyncHandler(
-  //   async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-  //     const user = await UserRepo.findByEmail(req.body.email);
-  //     if (user) throw new BadRequestError('User already registered');
-  //     // if (user && user.email) throw new BadRequestError('User already registered');
-
-  //     const accessTokenKey = generateTokenKey();
-  //     const refreshTokenKey = generateTokenKey();
-
-  //     req.body.referCode = await generateCode(5, 0, 70, '')
-
-  //     const { user: createdUser, keystore } = await UserRepo.create(
-  //       req.body as User,
-  //       accessTokenKey,
-  //       refreshTokenKey,
-  //       "DRIVER",
-  //     );
-
-  //     if (!createdUser) throw new BadRequestError('User creation field!');
-  //     const tokens = await createTokens(createdUser, keystore.primaryKey, keystore.secondaryKey);
-
-  //     const { token } = await this.tokenService.createToken({
-  //       shot_code: generateOTP(),
-  //       token: generateTokenKey(),
-  //       type: 'PHONE_VERIFY',
-  //       userId: createdUser.id,
-  //       expireAt: new Date()
-  //     } as Token)
-
-  //     // let link = `http://52.192.208.76/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
-  //     // if (createdUser && createdUser.email) {
-  //     //   // @ts-ignore
-  //     //   sendMail({ to: createdUser.email, text: link })
-  //     // }
-  //     console.log("Token: ", token)
-  //     new SuccessResponse('Signup Successful', {
-  //       user: _.pick(createdUser, ['id', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
-  //       tokens,
-  //       token
-  //     }).send(res);
-  //   }
-  // )
 
   signin = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -126,35 +75,67 @@ export class AccessController {
       if (!user.password) throw new BadRequestError('Credential not set');
       if (!user.status) throw new BadRequestError('User InActive');
 
-      if (user.phone_status !== "VERIFIED") {
-        const { token } = await this.tokenService.createToken({
-          shot_code: generateOTP(),
-          token: generateTokenKey(),
-          type: 'PHONE_VERIFY',
-          userId: user.id,
-          expireAt: new Date()
-        } as Token)
-
-        // let link = `http://localhost:8001/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
-        // if (user && user.email) {
-        //   // @ts-ignore
-        //   sendMail({ to: user.email, text: link, subject: "Email Verification" })
-        // }
-        console.log("Signin OTP: ", token)
-        throw new BadRequestError('please verify your phone!');
+      const isValidPassword = await comparePassword(req.body.password, user.password);
+      if (!isValidPassword) {
+        throw new BadRequestError('Invalid credentials!');
       }
 
-      comparePassword(req.body.password, user.password)
+      //   //if student then check parent email and phone status
+      //   if(user?.role?.code === "STUDENT" && user.parentId){
+      //     const parent = await UserRepo.findParentById(user.parentId);
+      //     console.log(parent , "PARENT____________")
+      //     if(!parent){
+      //       throw new BadRequestError('Parent not found');
+      //     }
+
+      //     if(parent.emailStatus !== "VERIFIED"){
+      //       throw new BadRequestError('Parent email not verified');
+      //     }
+
+      //     if(parent.phone_status !== "VERIFIED"){
+      //       throw new BadRequestError('Parent phone not verified');
+      //     }
+      // }
+      // else if (user.phone_status !== "VERIFIED") {
+      //     const { token } = await this.tokenService.createToken({
+      //       shot_code: generateOTP(),
+      //       token: generateTokenKey(),
+      //       type: 'PHONE_VERIFY',
+      //       userId: user.id,
+      //       expireAt: new Date()
+      //     } as Token)
+
+      //     // let link = `http://localhost:8001/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
+      //     // if (user && user.email) {
+      //     //   // @ts-ignore
+      //     //   sendMail({ to: user.email, text: link, subject: "Email Verification" })
+      //     // }
+      //     throw new BadRequestError('please verify your phone!');
+      //   }
+      //  else if (user.emailStatus !== "VERIFIED" && user?.role?.code == "PARENT") {
+      //     const { token } = await this.tokenService.createToken({
+      //       shot_code: generateOTP(),
+      //       token: generateTokenKey(),
+      //       type: 'EMAIL_VERIFY',
+      //       userId: user.id,
+      //       expireAt: new Date()
+      //     } as Token)
+
+      //     // let link = `http://localhost:8001/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
+      //     // if (user && user.email) {
+      //     //   // @ts-ignore
+      //     //   sendMail({ to: user.email, text: link, subject: "Email Verification" })
+      //     // }
+      //     console.log("Signin OTP: ", token)
+      //     throw new BadRequestError('please verify your email!');
+      //   }
 
       const accessTokenKey = generateTokenKey();
       const refreshTokenKey = generateTokenKey();
-
       await KeystoreRepo.create(user.id, accessTokenKey, refreshTokenKey);
-
       const tokens = await createTokens(user, accessTokenKey, refreshTokenKey);
-
       new SuccessResponse('Login Success', {
-        user: _.pick(user, ['id', 'first_name', 'last_name', 'email', 'profile_picture', 'role', 'phone_status', 'profilePicUrl', 'gender']),
+        user: _.pick(user, ['id', 'first_name', 'last_name', 'email', 'profile_picture', 'role', 'phone_status', 'profilePicUrl', 'gender', "childs"]),
         tokens: tokens,
       }).send(res);
 
@@ -198,7 +179,11 @@ export class AccessController {
   getUsers = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
       // console.log("data")
+      if (req.query.role === "STUDENT") {
+        const students = await UserRepo.findStudents(req.user.role.code, req.user.id)
+        return new SuccessResponse('fetch success', { users :students }).send(res);
 
+      }
       const users = await UserRepo.findUsers(req.query.role);
       new SuccessResponse('fetch success', { users }).send(res);
     }
@@ -365,8 +350,8 @@ export class AccessController {
         // @ts-ignore
         // sendMail({ subject: 'iPrint (Forgot Password)', to: user.email, text: link })
       }
-      console.log("==== link ====",link);
-      
+      console.log("==== link ====", link);
+
       new SuccessMsgResponse('Email send success, Check your email').send(res);
     }
   )
@@ -413,6 +398,6 @@ export class AccessController {
     }
   )
 
-  
+
 
 }

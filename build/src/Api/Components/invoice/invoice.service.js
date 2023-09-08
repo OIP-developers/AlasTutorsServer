@@ -16,7 +16,10 @@ exports.InvoiceService = void 0;
 const stripe_1 = __importDefault(require("stripe"));
 const globals_1 = require("../../../config/globals");
 const user_repository_1 = __importDefault(require("../access/user.repository"));
+// import Product, { ProductModel } from '../product/Product'
+// import { ProductRepo } from '../product/product.repository'
 const Order_1 = require("../order/Order");
+// import OrderRepo from '../order/order.repository'
 const invoice_repository_1 = __importDefault(require("./invoice.repository"));
 const Logger_1 = __importDefault(require("../../../core/Logger"));
 class InvoiceService {
@@ -63,10 +66,11 @@ class InvoiceService {
                 Logger_1.default.info(`stripe customer created ${customerId}`);
             }
             let totalAmount = Math.round(Number(Order === null || Order === void 0 ? void 0 : Order.total));
+            console.log("totalAmount", totalAmount);
             const payment = yield this._paymentIntentCreate({
                 currency: 'usd',
                 customer: customerId,
-                amount: totalAmount,
+                amount: 200,
                 description: "",
             });
             user_repository_1.default.updateInfo(user.id, {

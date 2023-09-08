@@ -11,10 +11,13 @@ const registerErrorHandler = (router: Router): Response | void => {
       Logger.error(err);
       ApiError.handle(err, res);
     } else {
-      console.log('====================================');
-      console.log("CODE", err.code);
-      console.log(err.code, err);
-      console.log('====================================');
+      // console.log('====================================');
+      // console.log("CODE", err.code);
+      // console.log(err.code, err);
+      // console.log('====================================');
+      console.log("Error Handler");
+      console.log(err)
+      
 
       if (err.code === "P2003") { // https://www.prisma.io/docs/reference/api-reference/error-reference#p2003
         ApiError.handle(new BadRequestError("You can't delete this! his associate data exist in another table"), res);

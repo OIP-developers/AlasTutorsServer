@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { NotFoundError } from '../../core/ApiError';
-import { AccessRoutes } from './access/access.routes';
+import { AccessRoutes } from './access.v2/access.routes';
 // import { ExampleRoutes } from './example/example.routes';
 // import { CategoryRoutes } from './category/category.routes';
 // import { ProductRoutes } from './product/product.routes';
@@ -12,6 +12,7 @@ import { CourseRoutes } from './course/course.routes';
 import { CartRoutes } from './cart/cart.routes';
 import { OrderRoutes } from './order/order.routes';
 import { InvoiceRoutes } from './invoice/invoice.routes';
+import { StudentRoutes } from './student/student.routes';
 // import { InvoiceRoutes } from './invoice/invoice.routes'
 
 // import { SubscriptionRoutes } from './subscription/subscription.routes'
@@ -33,6 +34,8 @@ export const registerApiRoutes = (router: Router, prefix: string = ''): void => 
   router.use(`${prefix}/cart`, new CartRoutes().router)
   router.use(`${prefix}/order`, new OrderRoutes().router)
   router.use(`${prefix}/invoice`, new InvoiceRoutes().router)
+
+  router.use(`${prefix}/student`, new StudentRoutes().router)
 
   
   

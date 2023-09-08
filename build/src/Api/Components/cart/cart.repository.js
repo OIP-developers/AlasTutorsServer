@@ -10,14 +10,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Cart_1 = require("./Cart");
-const User_1 = require("./../access/User");
 class CartRepo {
+    static create({ data }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Cart_1.CartModel.create({
+                data: {
+                    userId: data.userId,
+                    courseId: data.courseId,
+                    // AddCart:{
+                    //   create:{
+                    //   }
+                    // }
+                }
+            });
+        });
+    }
     // public static findById(id: Cart['id']) {
-    static findById({ where }) {
-        return User_1.UserModel.findUnique({
-            where,
+    static findById({ id }) {
+        return Cart_1.CartModel.findUnique({
+            where: { id },
             include: {
-                Cart: true
+                course: true
             }
         });
     }
@@ -65,18 +78,13 @@ class CartRepo {
         });
     }
     static find({ where }) {
-        return Cart_1.CartModel.findMany({ where: { isDeleted: false }, orderBy: { createdAt: 'desc' } });
-    }
-    static create({ body, user }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return Cart_1.CartModel.create({
-                data: {
-                    userId: user.id,
-                    ProductId: body.ProductId,
-                    quantity: body.quantity
-                }
-            });
-        });
+        return Cart_1.CartModel.findMany({ where: { isDeleted: false }, orderBy: { createdAt: 'desc' }, include: {
+                course: {
+                    include: {
+                        thumbnail: true
+                    }
+                },
+            } });
     }
     static update({ id, body }) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -84,8 +92,8 @@ class CartRepo {
             return Cart_1.CartModel.update({
                 where: { id },
                 data: {
-                    ProductId: body.ProductId,
-                    quantity: body.quantity
+                    courseId: body.courseId,
+                    // quantity: body.quantity
                 }
             });
         });
@@ -94,6 +102,20 @@ class CartRepo {
         return __awaiter(this, void 0, void 0, function* () {
             return Cart_1.CartModel.delete({
                 where: { id }
+            });
+        });
+    }
+    static deleteMany(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Cart_1.CartModel.deleteMany({
+                where: { userId }
+            });
+        });
+    }
+    static deleteManyy(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return Cart_1.CartModel.deleteMany({
+                where: { userId }
             });
         });
     }

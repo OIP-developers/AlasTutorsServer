@@ -17,9 +17,7 @@ class InvoiceRoutes {
     }
     initRoutes() {
         this.router.post('/payment_intents', authentication_1.default, this.controller.createPaymentIntent);
-        this.router.get('/payment_intents/confirm/:pi_id', 
-        // authentication,
-        this.controller.confirmPaymentIntent);
+        this.router.get('/payment_intents/confirm/:pi_id', authentication_1.default, this.controller.confirmPaymentIntent);
         this.router.get('/my', 
         // authentication,
         this.controller.getMyInvoices);

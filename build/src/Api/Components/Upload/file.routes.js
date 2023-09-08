@@ -17,8 +17,14 @@ class FileRoutes {
     }
     initRoutes() {
         this.router.use((0, express_formidable_1.default)());
-        this.router.post('/', this.controller.fileUpload);
-        this.router.get('/', this.controller.downloadFolder);
+        // this.router.post(
+        //   '/',
+        //   this.controller.fileUpload
+        // )
+        // this.router.get(
+        //   '/',
+        //   this.controller.downloadFolder
+        // )
         // this.router.post(
         //   '/image',
         //   this.controller.imageUpload
@@ -27,6 +33,7 @@ class FileRoutes {
         //   '/image/editor',
         //   this.controller.imageUploadForEditor
         // )
+        this.router.post('/', this.controller.videoUploadToS3);
     }
 }
 exports.FileRoutes = FileRoutes;

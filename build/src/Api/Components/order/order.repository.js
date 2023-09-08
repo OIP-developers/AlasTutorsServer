@@ -9,91 +9,154 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.OrderRepo = void 0;
 const Order_1 = require("./Order");
 class OrderRepo {
     // public static findById(id: Order['id']) {
-    static findById({ where }) {
-        return Order_1.OrderModel.findUnique({ where });
-    }
-    static findOne({ where }) {
-        return Order_1.OrderModel.findFirst({ where: Object.assign({}, where) });
-    }
-    static findMany({ Model, where, search, page = '1', limit = '10', fullTextSearch }) {
+    // public static findById({ where }: { where: Prisma.OrderWhereUniqueInput }) {
+    //   return OrderModel.findUnique({
+    //     where,
+    //     include: {
+    //       invoice: true,
+    //       items: {
+    //         include: {
+    //           course: true,
+    //         },
+    //       },
+    //       user: {
+    //         include: {
+    //           role: true,
+    //         },
+    //       },
+    //     },
+    //   });
+    // }
+    // public static findByUserId({ where, }: { where: Prisma.OrderWhereUniqueInput; }) {
+    //   return OrderModel.findUnique({
+    //     where,
+    //     include: {
+    //       invoice: true,
+    //       items: {
+    //         include: {
+    //           course: true,
+    //         },
+    //       },
+    //       user: {
+    //         include: {
+    //           role: true,
+    //         },
+    //       },
+    //     },
+    //   });
+    // }
+    // public static findOne({ where }: { where: Prisma.OrderWhereInput }) {
+    //   return OrderModel.findFirst({ where: { ...where } });
+    // }
+    // public static async findMany<WhereInput, Delegate>({
+    //   Model,
+    //   where,
+    //   search,
+    //   page = "1",
+    //   limit = "10",
+    //   fullTextSearch,
+    // }: {
+    //   Model: Delegate;
+    //   where: WhereInput;
+    //   search: string | undefined;
+    //   page: string;
+    //   limit: string;
+    //   fullTextSearch: string[];
+    // }) {
+    //   if (search) {
+    //     where = {
+    //       ...where,
+    //       OR: fullTextSearch.map((key) => {
+    //         return { name: { search } };
+    //       }),
+    //     };
+    //   }
+    //   console.log(JSON.stringify(where, null, 2));
+    //   // pagination
+    //   const crPage = parseInt(page, 10) || 1;
+    //   const crLimit = parseInt(limit, 10) || 10;
+    //   const startIndex = (crPage - 1) * crLimit;
+    //   const endIndex = crPage * crLimit;
+    //   // @ts-ignore
+    //   const total = await Model.count({ where });
+    //   const pages = Math.ceil(total / crLimit);
+    //   const pagination: any = {};
+    //   pagination.total = total;
+    //   pagination.pages = pages;
+    //   if (endIndex < total) {
+    //     pagination.next = {
+    //       page: crPage + 1,
+    //       limit: crLimit,
+    //     };
+    //   }
+    //   if (startIndex > 0) {
+    //     pagination.prev = {
+    //       page: crPage - 1,
+    //       limit: crLimit,
+    //     };
+    //   }
+    //   // @ts-ignore
+    //   const entities = await Model.findMany({
+    //     where,
+    //     skip: crLimit * (crPage - 1),
+    //     take: crLimit,
+    //   });
+    //   return { entities, pagination };
+    // }
+    // public static find({ where }: { where: Prisma.OrderWhereInput }) {
+    //   return OrderModel.findMany({
+    //     where,
+    //     include: {
+    //       invoice: true,
+    //       items: {
+    //         include: {
+    //           product: true,
+    //         },
+    //       },
+    //       user: {
+    //         include: {
+    //           role: true,
+    //         },
+    //       },
+    //     },
+    //   });
+    // }
+    static create({ body, user, items, }) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (search) {
-                where = Object.assign(Object.assign({}, where), { OR: fullTextSearch.map((key) => {
-                        return { name: { search } };
-                    }) });
-            }
-            console.log(JSON.stringify(where, null, 2));
-            // pagination
-            const crPage = parseInt(page, 10) || 1;
-            const crLimit = parseInt(limit, 10) || 10;
-            const startIndex = (crPage - 1) * crLimit;
-            const endIndex = crPage * crLimit;
-            // @ts-ignore
-            const total = yield Model.count({ where });
-            const pages = Math.ceil(total / crLimit);
-            const pagination = {};
-            pagination.total = total;
-            pagination.pages = pages;
-            if (endIndex < total) {
-                pagination.next = {
-                    page: crPage + 1,
-                    limit: crLimit,
-                };
-            }
-            if (startIndex > 0) {
-                pagination.prev = {
-                    page: crPage - 1,
-                    limit: crLimit,
-                };
-            }
-            // @ts-ignore
-            const entities = yield Model.findMany({
-                where,
-                skip: crLimit * (crPage - 1),
-                take: crLimit
-            });
-            return { entities, pagination };
-        });
-    }
-    static find({ where }) {
-        return Order_1.OrderModel.findMany({ where: { isDeleted: false }, orderBy: { createdAt: 'desc' } });
-    }
-    static create({ body, user }) {
-        return __awaiter(this, void 0, void 0, function* () {
+            // const employee = await UserModel.findFirst({
+            //   where: {
+            //     role: {
+            //       code: 'EMPLOYEE'
+            //     }
+            //   }
+            // })
+            // const manufacturer = await UserModel.findFirst({
+            //   where: {
+            //     role: {
+            //       code: 'MANUFACTURER'
+            //     }
+            //   }
+            // })
+            // if (!employee || !manufacturer) throw new BadRequestError('Employee or Manufacture not found')
             return Order_1.OrderModel.create({
-                data: Object.assign({}, body)
-            });
-        });
-    }
-    static statusUpdate({ id, status }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return Order_1.OrderModel.update({
-                where: { id },
                 data: {
-                    status: status.status
-                }
-            });
-        });
-    }
-    static update({ id, order }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // console.log("--------=====",id,order);
-            return Order_1.OrderModel.update({
-                where: { id },
-                data: order
-            });
-        });
-    }
-    static delete(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return Order_1.OrderModel.delete({
-                where: { id }
+                    userId: user.id,
+                    total: body.total,
+                    items: {
+                        createMany: {
+                            data: items.map((item) => {
+                                return item;
+                            }),
+                        },
+                    },
+                },
             });
         });
     }
 }
-exports.default = OrderRepo;
+exports.OrderRepo = OrderRepo;
 //# sourceMappingURL=order.repository.js.map

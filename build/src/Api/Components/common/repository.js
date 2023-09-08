@@ -15,7 +15,7 @@ class Repository {
         return __awaiter(this, void 0, void 0, function* () {
             if (search) {
                 where = Object.assign(Object.assign({}, where), { OR: fullTextSearch.map((key) => {
-                        return { [key]: { contains: search } };
+                        return { [key]: { contains: search, mode: "insensitive" } };
                     }) });
             }
             console.log(JSON.stringify(where, null, 2));

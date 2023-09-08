@@ -1,69 +1,71 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProductController = void 0;
-const async_1 = __importDefault(require("../../../helpers/async"));
-const product_repository_1 = require("./product.repository");
-const ApiResponse_1 = require("../../../core/ApiResponse");
-const Product_1 = require("./Product");
-const repository_1 = require("../common/repository");
-class ProductController {
-    constructor() {
-        this.getAll = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const { query } = req;
-            const { entities, pagination } = yield repository_1.Repository.findMany({
-                Model: Product_1.ProductModel,
-                where: {},
-                include: {
-                    categories: {
-                        select: {
-                            category: true,
-                        }
-                    }
-                },
-                search: query.search,
-                limit: query.limit,
-                page: query.page,
-                fullTextSearch: ['title', 'desc', 'price']
-            });
-            // if (categories.length === 0) throw new NoDataError();
-            new ApiResponse_1.SuccessResponse('fetch success', { entities, pagination }).send(res);
-        }));
-        this.getById = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const entity = yield product_repository_1.ProductRepo.findById({ where: { id: req.params.id } });
-            new ApiResponse_1.SuccessResponse('fetch success', { entity }).send(res);
-        }));
-        this.create = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const { body } = req;
-            const categories = body.categories;
-            // const gallery: string[] = body.gallery;
-            // const tags: string[] = body.tags;
-            const product = yield product_repository_1.ProductRepo.create({ body: body, categories: categories });
-            new ApiResponse_1.SuccessResponse('create success', { product }).send(res);
-        }));
-        this.update = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const { body, params } = req;
-            const categories = body.categories;
-            const product = yield product_repository_1.ProductRepo.update({ id: params.id, body: body, categories: categories });
-            new ApiResponse_1.SuccessResponse('update success', { product }).send(res);
-        }));
-        this.delete = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const { params } = req;
-            const product = yield product_repository_1.ProductRepo.delete(params.id);
-            new ApiResponse_1.SuccessResponse('delete success', { product }).send(res);
-        }));
-    }
-}
-exports.ProductController = ProductController;
+// import { Response, Request, NextFunction } from "express";
+// import { ProtectedRequest } from "../../../types/app-request";
+// import asyncHandler from "../../../helpers/async";
+// import { ProductRepo } from './product.repository';
+// import { BadRequestError } from '../../../core/ApiError';
+// import { SuccessMsgResponse, SuccessResponse } from '../../../core/ApiResponse';
+// import Product, { ProductModel } from './Product';
+// import { Repository } from "../common/repository";
+// import { Prisma } from "@prisma/client";
+// export class ProductController {
+//   getAll = asyncHandler(
+//     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+//       const { query } = req
+//       const { entities, pagination } = await Repository.findMany<
+//         Prisma.ProductWhereInput,
+//         Prisma.ProductDelegate<Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined>,
+//         Prisma.ProductSelect,
+//         Prisma.ProductInclude
+//       >({
+//         Model: ProductModel,
+//         where: {},
+//         include: {
+//           categories: {
+//             select: {
+//               category: true,
+//             }
+//           }
+//         },
+//         search: query.search,
+//         limit: query.limit,
+//         page: query.page,
+//         fullTextSearch: ['title', 'desc', 'price']
+//       });
+//       // if (categories.length === 0) throw new NoDataError();
+//       new SuccessResponse('fetch success', { entities, pagination }).send(res);
+//     }
+//   )
+//   getById = asyncHandler(
+//     async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+//       const entity = await ProductRepo.findById({ where: { id: req.params.id } });
+//       new SuccessResponse('fetch success', { entity }).send(res);
+//     }
+//   )
+//   create = asyncHandler(
+//     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+//       const { body } = req;
+//       const categories: string[] = body.categories;
+//       // const gallery: string[] = body.gallery;
+//       // const tags: string[] = body.tags;
+//       const product = await ProductRepo.create({ body: body, categories: categories });
+//       new SuccessResponse('create success', { product }).send(res);
+//     }
+//   )
+//   update = asyncHandler(
+//     async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+//       const { body, params } = req;
+//       const categories: string[] = body.categories;
+//       const product = await ProductRepo.update({ id: params.id, body: body, categories: categories});
+//       new SuccessResponse('update success', { product }).send(res);
+//     }
+//   )
+//   delete = asyncHandler(
+//     async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+//       const { params } = req;
+//       const product = await ProductRepo.delete(params.id);
+//       new SuccessResponse('delete success', { product }).send(res);
+//     }
+//   )
+// }
 //# sourceMappingURL=product.controller.js.map
