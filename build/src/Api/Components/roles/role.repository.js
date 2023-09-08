@@ -9,23 +9,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const database_1 = require("./../../../database");
-class RoleRepo {
-    static findById(id) {
-        return database_1.prisma.role.findUnique({ where: { id } });
-    }
+exports.RoleRepository = void 0;
+const Role_1 = require("./Role");
+class RoleRepository {
     static findByCode(code) {
-        return database_1.prisma.role.findUnique({ where: { code } });
-    }
-    static createMany(body) {
         return __awaiter(this, void 0, void 0, function* () {
-            const roles = yield database_1.prisma.role.createMany({
-                data: body,
-                skipDuplicates: true,
-            });
-            return { roles };
+            const role = yield Role_1.RoleModel.findUniqueOrThrow({ where: { code } });
+            return role;
+        });
+    }
+    static findById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const role = yield Role_1.RoleModel.findUniqueOrThrow({ where: { id } });
+            return role;
         });
     }
 }
-exports.default = RoleRepo;
+exports.RoleRepository = RoleRepository;
+;
+exports.default = RoleRepository;
 //# sourceMappingURL=role.repository.js.map

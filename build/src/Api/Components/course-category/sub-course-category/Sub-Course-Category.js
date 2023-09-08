@@ -1,7 +1,6 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CourseSubCategoryModel = exports.DOCUMENT_NAME = void 0;
-const database_1 = require("../../../../database");
-exports.DOCUMENT_NAME = database_1.IPrisma.ModelName.CourseSubCategory;
-exports.CourseSubCategoryModel = database_1.prisma.courseSubCategory;
+// import { prisma, IPrisma, CourseSubCategory } from '../../../../database';
+// export const DOCUMENT_NAME = IPrisma.ModelName.CourseSubCategory;
+// export default CourseSubCategory;
+// export const CourseSubCategoryModel = prisma.courseSubCategory;
 //# sourceMappingURL=Sub-Course-Category.js.map

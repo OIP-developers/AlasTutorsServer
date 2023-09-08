@@ -45,7 +45,7 @@ const validator_1 = __importStar(require("../helpers/validator"));
 const joi_schema_1 = require("../utils/joi.schema");
 const async_1 = __importDefault(require("../helpers/async"));
 const router = (0, express_1.Router)();
-exports.default = router.use((0, validator_1.default)(joi_schema_1.authBearerSchema, validator_1.ValidationSource.HEADER), (0, async_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+exports.default = router.use((0, validator_1.default)(joi_schema_1.authBearerSchema, validator_1.ValidationSource.HEADER), (0, async_1.default)((req, _, next) => __awaiter(void 0, void 0, void 0, function* () {
     req.accessToken = (0, authUtils_1.getAccessToken)(req.headers.authorization); // Express headers are auto converted to lowercase
     try {
         const payload = yield JWT_1.default.validate(req.accessToken);
@@ -53,13 +53,8 @@ exports.default = router.use((0, validator_1.default)(joi_schema_1.authBearerSch
         const user = yield user_repository_1.default.findById(payload.sub);
         if (!user)
             throw new ApiError_1.AuthFailureError('User not registered');
+        //@ts-ignore
         req.user = user;
-        // @ts-ignore
-        req.company = user.company;
-        // console.log('====================================');
-        // console.log(req.company);
-        // console.log(req.user);
-        // console.log('====================================');
         const keystore = yield keystore_repository_1.default.findforKey(req.user.id, payload.prm);
         console.log(req.user.id, payload, keystore);
         if (!keystore)

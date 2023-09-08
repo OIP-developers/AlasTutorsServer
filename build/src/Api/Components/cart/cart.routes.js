@@ -7,8 +7,10 @@ exports.CartRoutes = void 0;
 const express_1 = require("express");
 const cart_controller_1 = require("./cart.controller");
 const validator_1 = __importDefault(require("../../../helpers/validator"));
-const authentication_1 = __importDefault(require("../../../middleware/authentication"));
+// import authorization from "../../../middlewares/authorization";
+// import authentication from "../../../middlewares/authentication";
 const schema_1 = __importDefault(require("./schema"));
+const authentication_1 = __importDefault(require("../../../middleware/authentication"));
 class CartRoutes {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -16,6 +18,7 @@ class CartRoutes {
         this.initRoutes();
     }
     initRoutes() {
+        this.router.get('/my', authentication_1.default, this.controller.getByUser);
         this.router.get('/:id', this.controller.getById);
         // this.router.get(
         //   '/',
@@ -23,7 +26,8 @@ class CartRoutes {
         // )
         this.router.post('/', authentication_1.default, 
         // authorization(["USER"]),
-        (0, validator_1.default)(schema_1.default.create), this.controller.create);
+        // validator(schema.create),
+        this.controller.create);
         this.router.put('/:id', authentication_1.default, 
         // authorization(["USER"]),
         (0, validator_1.default)(schema_1.default.create), this.controller.update);

@@ -13,4 +13,5 @@
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
   },
+  "workbench.colorTheme": "GitHub Dark Default",
 }

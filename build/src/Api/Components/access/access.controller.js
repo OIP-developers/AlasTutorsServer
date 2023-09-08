@@ -8,101 +8,70 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AccessController = void 0;
-// import { Types } from 'mongoose';
-// import crypto from 'crypto';
 const async_1 = __importDefault(require("../../../helpers/async"));
 const user_repository_1 = __importDefault(require("./user.repository"));
 const ApiError_1 = require("../../../core/ApiError");
 const tokenKeyGenerator_1 = require("../../../helpers/tokenKeyGenerator");
-const otpGenerate_1 = require("../../../helpers/otpGenerate");
 const ApiResponse_1 = require("../../../core/ApiResponse");
 const lodash_1 = __importDefault(require("lodash"));
 const authUtils_1 = require("../../../utils/authUtils");
 const keystore_repository_1 = __importDefault(require("./keystore.repository"));
 const token_service_1 = require("../token/token.service");
 const password_1 = require("../../../utils/password");
+const access_service_1 = require("./access.service");
 // import { sendMail } from "../../../utils/email";
 // import JWT from '../../../core/JWT';
 // import { validateTokenData, createTokens, getAccessToken } from '../../../utils/authUtils';
 class AccessController {
     constructor() {
         this.tokenService = new token_service_1.TokenService();
-        // readonly service: AccessService = new AccessService()
+        this.accessService = new access_service_1.AccessService();
         this.signup = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const user = yield user_repository_1.default.findByEmail(req.body.email);
+            const { students, parent, emergencyContact } = req.body;
+            const { mother = null, father = null } = parent, parentData = __rest(parent, ["mother", "father"]);
+            // if parent email is already registered
+            const user = yield user_repository_1.default.findByEmail(parent.email);
             if (user)
                 throw new ApiError_1.BadRequestError('User already registered');
-            // if (user && user.email) throw new BadRequestError('User already registered');
-            const accessTokenKey = (0, tokenKeyGenerator_1.generateTokenKey)();
-            const refreshTokenKey = (0, tokenKeyGenerator_1.generateTokenKey)();
-            const { user: createdUser, keystore } = yield user_repository_1.default.create(req.body, accessTokenKey, refreshTokenKey, req.body.role);
-            if (!createdUser)
-                throw new ApiError_1.BadRequestError('User creation field!');
-            const tokens = yield (0, authUtils_1.createTokens)(createdUser, keystore.primaryKey, keystore.secondaryKey);
-            const { token } = yield this.tokenService.createToken({
-                shot_code: (0, otpGenerate_1.generateOTP)(),
-                token: (0, tokenKeyGenerator_1.generateTokenKey)(),
-                type: 'PHONE_VERIFY',
-                userId: createdUser.id,
-                expireAt: new Date()
-            });
-            // if (createdUser && createdUser.phone) {
-            //   // @ts-ignore
-            //   console.log({ to: createdUser.phone, text: token?.shot_code });
-            // }
-            // let link = `http://52.192.208.76/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
-            // if (createdUser && createdUser.email) {
-            //   // @ts-ignore
-            //   sendMail({ to: createdUser.email, text: link })
-            // }
-            console.log("Token: ", token);
+            const allStudents = [];
+            const allGuardians = [];
+            const { user: parentUser } = yield this.accessService.createParent(parentData, emergencyContact);
+            students.forEach((student) => __awaiter(this, void 0, void 0, function* () {
+                const { medicalCondition } = student, studentData = __rest(student, ["medicalCondition"]);
+                const { student: studentUser } = yield this.accessService.createStudent(Object.assign(Object.assign({}, studentData), { parentId: parentUser.id }), medicalCondition, parentUser.id);
+                allStudents.push(studentUser);
+            }));
+            if (mother) {
+                allGuardians.push(Object.assign(Object.assign({}, mother), { type: "MOTHER", userId: parentUser.id }));
+            }
+            if (father) {
+                allGuardians.push(Object.assign(Object.assign({}, father), { type: "FATHER", userId: parentUser.id }));
+            }
+            if (allGuardians.length) {
+                // creating guardians
+                yield this.accessService.createGuardians(allGuardians);
+            }
             new ApiResponse_1.SuccessResponse('Signup Successful', {
-                user: lodash_1.default.pick(createdUser, ['id', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
-                tokens,
-                token,
+                parent: lodash_1.default.pick(parent, ['id', 'username', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
+                student: allStudents,
             }).send(res);
         }));
-        // signupDriver = asyncHandler(
-        //   async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-        //     const user = await UserRepo.findByEmail(req.body.email);
-        //     if (user) throw new BadRequestError('User already registered');
-        //     // if (user && user.email) throw new BadRequestError('User already registered');
-        //     const accessTokenKey = generateTokenKey();
-        //     const refreshTokenKey = generateTokenKey();
-        //     req.body.referCode = await generateCode(5, 0, 70, '')
-        //     const { user: createdUser, keystore } = await UserRepo.create(
-        //       req.body as User,
-        //       accessTokenKey,
-        //       refreshTokenKey,
-        //       "DRIVER",
-        //     );
-        //     if (!createdUser) throw new BadRequestError('User creation field!');
-        //     const tokens = await createTokens(createdUser, keystore.primaryKey, keystore.secondaryKey);
-        //     const { token } = await this.tokenService.createToken({
-        //       shot_code: generateOTP(),
-        //       token: generateTokenKey(),
-        //       type: 'PHONE_VERIFY',
-        //       userId: createdUser.id,
-        //       expireAt: new Date()
-        //     } as Token)
-        //     // let link = `http://52.192.208.76/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
-        //     // if (createdUser && createdUser.email) {
-        //     //   // @ts-ignore
-        //     //   sendMail({ to: createdUser.email, text: link })
-        //     // }
-        //     console.log("Token: ", token)
-        //     new SuccessResponse('Signup Successful', {
-        //       user: _.pick(createdUser, ['id', 'first_name', 'last_name', 'email', 'phone_status', 'role', 'profilePicUrl', 'gender']),
-        //       tokens,
-        //       token
-        //     }).send(res);
-        //   }
-        // )
         this.signin = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const user = yield user_repository_1.default.findByEmail(req.body.email);
             console.log('====================================');
@@ -114,29 +83,61 @@ class AccessController {
                 throw new ApiError_1.BadRequestError('Credential not set');
             if (!user.status)
                 throw new ApiError_1.BadRequestError('User InActive');
-            if (user.phone_status !== "VERIFIED") {
-                const { token } = yield this.tokenService.createToken({
-                    shot_code: (0, otpGenerate_1.generateOTP)(),
-                    token: (0, tokenKeyGenerator_1.generateTokenKey)(),
-                    type: 'PHONE_VERIFY',
-                    userId: user.id,
-                    expireAt: new Date()
-                });
-                // let link = `http://localhost:8001/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
-                // if (user && user.email) {
-                //   // @ts-ignore
-                //   sendMail({ to: user.email, text: link, subject: "Email Verification" })
-                // }
-                console.log("Signin OTP: ", token);
-                throw new ApiError_1.BadRequestError('please verify your phone!');
+            const isValidPassword = yield (0, password_1.comparePassword)(req.body.password, user.password);
+            if (!isValidPassword) {
+                throw new ApiError_1.BadRequestError('Invalid credentials!');
             }
-            (0, password_1.comparePassword)(req.body.password, user.password);
+            //   //if student then check parent email and phone status
+            //   if(user?.role?.code === "STUDENT" && user.parentId){
+            //     const parent = await UserRepo.findParentById(user.parentId);
+            //     console.log(parent , "PARENT____________")
+            //     if(!parent){
+            //       throw new BadRequestError('Parent not found');
+            //     }
+            //     if(parent.emailStatus !== "VERIFIED"){
+            //       throw new BadRequestError('Parent email not verified');
+            //     }
+            //     if(parent.phone_status !== "VERIFIED"){
+            //       throw new BadRequestError('Parent phone not verified');
+            //     }
+            // }
+            // else if (user.phone_status !== "VERIFIED") {
+            //     const { token } = await this.tokenService.createToken({
+            //       shot_code: generateOTP(),
+            //       token: generateTokenKey(),
+            //       type: 'PHONE_VERIFY',
+            //       userId: user.id,
+            //       expireAt: new Date()
+            //     } as Token)
+            //     // let link = `http://localhost:8001/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
+            //     // if (user && user.email) {
+            //     //   // @ts-ignore
+            //     //   sendMail({ to: user.email, text: link, subject: "Email Verification" })
+            //     // }
+            //     throw new BadRequestError('please verify your phone!');
+            //   }
+            //  else if (user.emailStatus !== "VERIFIED" && user?.role?.code == "PARENT") {
+            //     const { token } = await this.tokenService.createToken({
+            //       shot_code: generateOTP(),
+            //       token: generateTokenKey(),
+            //       type: 'EMAIL_VERIFY',
+            //       userId: user.id,
+            //       expireAt: new Date()
+            //     } as Token)
+            //     // let link = `http://localhost:8001/api/v1/auth/email-verify?token=${token?.token}&user=${token?.userId}`
+            //     // if (user && user.email) {
+            //     //   // @ts-ignore
+            //     //   sendMail({ to: user.email, text: link, subject: "Email Verification" })
+            //     // }
+            //     console.log("Signin OTP: ", token)
+            //     throw new BadRequestError('please verify your email!');
+            //   }
             const accessTokenKey = (0, tokenKeyGenerator_1.generateTokenKey)();
             const refreshTokenKey = (0, tokenKeyGenerator_1.generateTokenKey)();
             yield keystore_repository_1.default.create(user.id, accessTokenKey, refreshTokenKey);
             const tokens = yield (0, authUtils_1.createTokens)(user, accessTokenKey, refreshTokenKey);
             new ApiResponse_1.SuccessResponse('Login Success', {
-                user: lodash_1.default.pick(user, ['id', 'first_name', 'last_name', 'email', 'profile_picture', 'role', 'phone_status', 'profilePicUrl', 'gender']),
+                user: lodash_1.default.pick(user, ['id', 'first_name', 'last_name', 'email', 'profile_picture', 'role', 'phone_status', 'profilePicUrl', 'gender', "childs"]),
                 tokens: tokens,
             }).send(res);
         }));
@@ -158,7 +159,12 @@ class AccessController {
             new ApiResponse_1.SuccessResponse('fetch success', { user: createdUser }).send(res);
         }));
         this.getUsers = (0, async_1.default)((req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            const users = yield user_repository_1.default.findUsers();
+            // console.log("data")
+            if (req.query.role === "STUDENT") {
+                const students = yield user_repository_1.default.findStudents(req.user.role.code, req.user.id);
+                return new ApiResponse_1.SuccessResponse('fetch success', { users: students }).send(res);
+            }
+            const users = yield user_repository_1.default.findUsers(req.query.role);
             new ApiResponse_1.SuccessResponse('fetch success', { users }).send(res);
         }));
         // getTeachers = asyncHandler(
