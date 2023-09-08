@@ -287,6 +287,28 @@ export default class CourseRepo {
     })
   }
 
+  public static findCourseByCategoryIdId(categoryId: Course['categoryId']): Promise<Course | null> {
+    return CourseModel.findUnique({
+      //@ts-ignore
+      where: { categoryId },
+    
+      include:{
+        thumbnail:true,
+        Cart:true,
+        orderItems:true,
+        videos:{
+          include:{
+            thumbnail:{
+             
+            }
+          }
+        },
+        tags:true
+      }
+
+    })
+  }
+
   // public static async statusUpdate({ id, status }: { id: Category['id'], status: Prisma.CategoryUpdateInput }) {
   //   return CategoryModel.update({
   //     where: { id },

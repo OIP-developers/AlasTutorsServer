@@ -35,6 +35,11 @@ export class CourseCategoryRoutes {
       this.controller.getAll
     )
 
+    this.router.get(
+      '/public',
+      this.controller.getAll
+    )
+
   
 
     this.router.post(

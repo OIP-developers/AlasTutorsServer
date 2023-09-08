@@ -53,6 +53,7 @@ function main() {
                     first_name: "Super",
                     last_name: "Admin",
                     status: 'PUBLIC',
+                    stripe_customerId: "",
                     roleId: admin_role.id,
                 }
             });

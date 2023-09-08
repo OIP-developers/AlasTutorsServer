@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const joi_1 = __importDefault(require("joi"));
 exports.default = {
     create: joi_1.default.object().keys({
-        ProductId: joi_1.default.string().required(),
-        quantity: joi_1.default.number().required(),
+        productId: joi_1.default.string().required(),
+        // quantity: Joi.number().required(),
     })
 };
 //# sourceMappingURL=schema.js.map

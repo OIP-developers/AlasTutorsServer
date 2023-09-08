@@ -18,16 +18,27 @@ const ApiError_1 = require("../../../core/ApiError");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const keystore_repository_1 = __importDefault(require("./keystore.repository"));
 const Logger_1 = __importDefault(require("../../../core/Logger"));
+const slugify_1 = __importDefault(require("slugify"));
+const Student_1 = require("./Student");
 class UserRepo {
     static find({ where }) {
         return User_1.UserModel.findMany({
             where: Object.assign({}, where)
         });
     }
-    static findUsers() {
+    static findStudents(role, id) {
+        const query = {};
+        if (role === "PARENT") {
+            query.parentId = id;
+        }
+        return Student_1.StudentModel.findMany({
+            where: query
+        });
+    }
+    static findUsers(role) {
         return User_1.UserModel.findMany({
             where: {
-                role: { code: "STUDENT" }
+                role: { code: role }
             },
             include: {
                 role: {
@@ -111,7 +122,26 @@ class UserRepo {
                         code: true
                     }
                 },
+                students: true,
             }
+        });
+    }
+    static findByUsername(username) {
+        return User_1.UserModel.findFirst({
+            where: { username },
+            include: {
+                role: {
+                    select: {
+                        id: true,
+                        code: true
+                    }
+                }
+            }
+        });
+    }
+    static findParentById(id) {
+        return User_1.UserModel.findUnique({
+            where: { id }
         });
     }
     static create(user, accessTokenKey, refreshTokenKey, roleCode) {
@@ -120,15 +150,26 @@ class UserRepo {
             const role = yield role_repository_1.default.findByCode(roleCode);
             if (!role)
                 throw new ApiError_1.InternalError('Role must be defined in db!');
-            user.password = bcrypt_1.default.hashSync(user.password || "NotPossible", 10);
+            const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            if (!user.password) {
+                //generating random password
+                user.password = Array.from({ length: 8 }, () => charset[Math.floor(Math.random() * charset.length)]).join('');
+            }
+            const password = bcrypt_1.default.hashSync(user.password, 10);
             user.roleId = role.id;
-            user.phone_status = 'VERIFIED'; // 'VERIFIED'; // 'PENDING'
-            user.gender = 'MALE';
             user.createdAt = user.updatedAt = now;
+            user.stripe_customerId = '';
             // @ts-ignore 
             delete user.role;
+            let username = (`${user.first_name}.${user.last_name}`).toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
+            //to generate a unique username
+            const userCount = yield User_1.UserModel.count();
+            username = username.toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
+            username = `${username}.${userCount}`;
+            user.username = (0, slugify_1.default)(username);
+            console.log(user);
             const createdUser = yield User_1.UserModel.create({
-                data: Object.assign({}, user),
+                data: Object.assign(Object.assign({}, user), { password }),
                 include: {
                     role: {
                         select: {

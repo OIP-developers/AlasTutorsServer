@@ -104,6 +104,35 @@ export class CourseController {
     }
   )
 
+  getPublicCourses = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+
+      const courses = await CourseRepo.find({
+        where: {},
+        include: {
+          tags: true,
+          banner: true,
+          category: true,
+          reviews: true,
+          thumbnail: true,
+          videos: true,
+          createdBy: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              email: true,
+              profile_picture: true,
+            }
+          }
+        }
+      });
+
+      new SuccessResponse('fetch success', { courses }).send(res);
+
+    }
+  )
+
   create = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
       const { body, user } = req;
@@ -166,6 +195,73 @@ export class CourseController {
       // // })
       //@ts-ignore
       course.isCart = Cart ? true : false
+
+      new SuccessResponse('fetch success', { course }).send(res);
+
+    }
+  )
+  getByPublicId = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { user, parms } = req;
+
+      const course = await CourseRepo.findById(req.params.id);
+      // //@ts-ignore
+      // const Cart = course.Cart.find((subs) => subs.userId === req.user.id)
+      // // console.log("isCart",isCart)
+      // //   console.log("isSubscribed",isSubscribed);
+
+      // // //   return {
+      // // //     isSubscribed: isSubscribed ? true : false,
+      // // //     ...channel
+      // // //   }
+      // // // })
+      // //@ts-ignore
+      // course.isCart = Cart ? true : false
+
+      new SuccessResponse('fetch success', { course }).send(res);
+
+    }
+  )
+  getPublicById = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { user, parms } = req;
+
+      const course = await CourseRepo.findById(req.params.id);
+      //@ts-ignore
+      // const Cart = course.Cart.find((subs) => subs.userId === req.user.id)
+      // // console.log("isCart",isCart)
+      // //   console.log("isSubscribed",isSubscribed);
+
+      // // //   return {
+      // // //     isSubscribed: isSubscribed ? true : false,
+      // // //     ...channel
+      // // //   }
+      // // // })
+      // //@ts-ignore
+      // course.isCart = Cart ? true : false
+
+      new SuccessResponse('fetch success', { course }).send(res);
+
+    }
+  )
+
+  getCoureByCategoryId = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { user, parms } = req;
+
+      const course = await CourseRepo.findById(req.query.id);
+      //@ts-ignore
+      // const Cart = course.Cart.find((subs) => subs.userId === req.user.id)
+      // // console.log("isCart",isCart)
+      // //   console.log("isSubscribed",isSubscribed);
+
+      // // //   return {
+      // // //     isSubscribed: isSubscribed ? true : false,
+      // // //     ...channel
+      // // //   }
+      // // // })
+      // //@ts-ignore
+      // course.isCart = Cart ? true : false
 
       new SuccessResponse('fetch success', { course }).send(res);
 

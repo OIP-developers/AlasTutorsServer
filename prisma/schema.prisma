@@ -17,6 +17,7 @@ datasource db {
 enum Gender {
   MALE
   FEMALE
+  NON_BINARY
 }
 
 enum RoleCode {
@@ -35,6 +36,19 @@ enum PhoneStatus {
   PENDING
   BLOCK
   WRONG
+}
+
+enum EmailStatus {
+  VERIFIED
+  PENDING
+  BLOCK
+  WRONG
+}
+
+enum GuardianType {
+  MOTHER
+  FATHER
+  OTHER
 }
 
 // ==========================================================================================
@@ -77,94 +91,119 @@ model Tokenstore {
 
 model Address {
   line1      String
-  line2      String
+  line2      String?
   city       String
   postalCode String
   country    String
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  user       User    @relation(fields: [userId], references: [id])
+  userId     String
 
   @@id([userId])
 }
 
-// model MedicalHistory {
+model EmergencyContact {
+  first_name      String
+  last_name       String
+  phone           String
+  emergency_phone String
+  email           String?
+  gp_name         String
+  line1           String
+  line2           String?
+  city            String
+  postalCode      String
+  country         String
+  user            User    @relation(fields: [userId], references: [id])
+  userId          String
 
-//   firstName String
-//   lastName String
+  @@id([userId])
+}
 
-//   contact String
-//   GP_name String
+model MedicalCondition {
+  isMedicalConditions Boolean @default(false)
+  typeOfCondition     String?
+  medicationGiven     String?
+  studentId           String
+  student             Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
-//   phone String
-//   email String
+  @@id([studentId])
+}
 
-//   line1      String
-//   line2      String
-//   city       String
-//   postalCode String
-//   country    String
+model Student {
+  id                      String            @id @default(uuid())
+  first_name              String
+  middle_name             String?
+  last_name               String
+  gender                  Gender
+  dateOfBirth             DateTime
+  yearGroup               String
+  isPromotionAllowed      Boolean           @default(false)
+  isSpecialEducationNeeds Boolean           @default(false)
+  isSiblingEnrolled       Boolean           @default(false)
+  sibling_first_name      String?
+  sibling_last_name       String?
+  deletedAt               DateTime?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime?         @updatedAt
+  parentId                String
+  parent                  User?             @relation(fields: [parentId], references: [id])
+  medicalCondition        MedicalCondition?
+}
 
-//   medicalConditions Boolean
-//   specialEducationNeeds Boolean
+model Guardian {
+  id          String  @id @default(uuid())
+  first_name  String?
+  middle_name String?
+  last_name   String?
+  title       String?
 
-//   typeOfCondition String
-
-//   user   User   @relation(fields: [userId], references: [id])
-//   userId String
-
-//   @@id([userId])
-// }
+  type   GuardianType
+  userId String
+  user   User         @relation(fields: [userId], references: [id])
+}
 
 model User {
-  id String @id @default(uuid())
+  id                String  @id @default(uuid())
+  username          String  @unique // auto generate
+  email             String  @unique
+  password          String // auto generate
+  phone             String?
+  stripe_customerId String?
 
-  email    String? @unique
-  username String? @unique
-
-  password          String
-  stripe_customerId String
-
-  first_name String?
-  middleName String?
-  last_name  String?
-
-  phone_status    PhoneStatus?
-  phone           String?
+  first_name      String?
+  middle_name     String?
+  last_name       String?
   profile_picture String?
   gender          Gender?
   dateOfBirth     DateTime?
   yearGroup       String?
 
-  aboutInfo String?
+  status       Status?      @default(PUBLIC)
+  emailStatus  EmailStatus? @default(PENDING)
+  phone_status PhoneStatus? @default(PENDING)
 
-  status     Status?   @default(PUBLIC)
-  isAccepted Boolean?  @default(false)
-  isVerified Boolean?  @default(true)
-  isActive   Boolean?  @default(true)
-  isDeleted  Boolean?  @default(false)
-  createdAt  DateTime? @default(now())
-  updatedAt  DateTime? @updatedAt
+  deletedAt DateTime?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 
   roleId String
   role   Role   @relation(fields: [roleId], references: [id])
 
-  parentId String?
-  parent   User?   @relation("users", fields: [parentId], references: [id])
+  address          Address?
+  emergencyContact EmergencyContact?
 
-  childs User[] @relation("users")
-
+  guardians  Guardian[]
   invoices   Invoice[]
-  Keystore   Keystore[]
+  keystore   Keystore[]
   tokenstore Tokenstore[]
   reviews    CourseReview[]
   files      File[]
   courses    Course[]
   orders     Order[]
-  Cart       Cart[]
-  Wallet     Wallet?
+  cart       Cart[]
+  wallet     Wallet?
   views      View[]
-  address    Address?
+  students     Student[]
 }
 
 model File {
@@ -425,6 +464,12 @@ model Invoice {
   isDeleted Boolean?      @default(false)
   createdAt DateTime?     @default(now())
   updatedAt DateTime?     @updatedAt
+}
+
+model Sequence {
+  id       String @id @default(uuid())
+  users    Int
+  students Int
 }
 
 model Cart {

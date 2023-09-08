@@ -1,1 +1,1 @@
-{"version":3,"file":"User.js","sourceRoot":"","sources":["../../../../../src/Api/Components/access/User.ts"],"names":[],"mappings":";;;AAAA,kDAA4D;AAE/C,QAAA,aAAa,GAAG,kBAAO,CAAC,SAAS,CAAC,IAAI,CAAC;AACvC,QAAA,eAAe,GAAG,OAAO,CAAC;AAI1B,QAAA,SAAS,GAAG,iBAAM,CAAC,IAAI,CAAC"}
+{"version":3,"file":"User.js","sourceRoot":"","sources":["../../../../../src/Api/Components/access/User.ts"],"names":[],"mappings":";;;AAAA,kDAAqE;AAExD,QAAA,aAAa,GAAG,kBAAO,CAAC,SAAS,CAAC,IAAI,CAAC;AACvC,QAAA,eAAe,GAAG,OAAO,CAAC;AAI1B,QAAA,SAAS,GAAG,iBAAM,CAAC,IAAI,CAAC"}

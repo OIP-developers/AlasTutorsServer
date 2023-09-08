@@ -17,9 +17,7 @@ class AccessRoutes {
         this.initRoutes();
     }
     initRoutes() {
-        this.router.post('/signup', 
-        // validator(signupSchema),
-        this.controller.signup);
+        this.router.post('/signup', (0, validator_1.default)(joi_schema_1.signUpSchema), this.controller.signup);
         // this.router.post(
         //   '/driver/signup',
         //   validator(driverSignupSchema),
@@ -34,8 +32,7 @@ class AccessRoutes {
         // authorization(["COMPANY_ADMIN"]),
         // validator(employeeAddSchema),
         this.controller.addUser);
-        this.router.get('/users', 
-        // authentication,
+        this.router.get('/users', authentication_1.default, 
         // authorization(["COMPANY_ADMIN", "ADMIN"]),
         this.controller.getUsers);
         // this.router.get(

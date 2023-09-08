@@ -8,12 +8,13 @@ import { getAccessToken, validateTokenData } from '../utils/authUtils';
 import validator, { ValidationSource } from '../helpers/validator';
 import { authBearerSchema } from '../utils/joi.schema';
 import asyncHandler from '../helpers/async';
+import { Role, User } from '@prisma/client';
 
 const router = Router();
 
 export default router.use(
   validator(authBearerSchema, ValidationSource.HEADER),
-  asyncHandler(async (req: any, res, next) => {    
+  asyncHandler(async (req: Request, _, next) => {    
     req.accessToken = getAccessToken(req.headers.authorization); // Express headers are auto converted to lowercase
     try {
       const payload = await JWT.validate(req.accessToken);
@@ -21,13 +22,9 @@ export default router.use(
 
       const user = await UserRepo.findById(payload.sub);
       if (!user) throw new AuthFailureError('User not registered');
+      //@ts-ignore
       req.user = user;
-      // @ts-ignore
-      req.company = user.company;
-      // console.log('====================================');
-      // console.log(req.company);
-      // console.log(req.user);
-      // console.log('====================================');
+
 
       const keystore = await KeystoreRepo.findforKey(req.user.id, payload.prm);
       console.log(req.user.id, payload, keystore);

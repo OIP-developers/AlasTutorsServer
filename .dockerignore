@@ -1,4 +1,10 @@
-# Add any directories, files, or patterns you don't want to be tracked by version control
+
+
+
+
+
+
+x# Add any directories, files, or patterns you don't want to be tracked by version control
 .idea
 
 # ignore vs code project config files

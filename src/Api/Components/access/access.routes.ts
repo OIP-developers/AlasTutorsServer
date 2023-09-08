@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import { AccessController } from './access.controller';
 import validator, { ValidationSource } from '../../../helpers/validator';
-import { signupSchema, userCredential, driverSignupSchema, refreshToken, authBearerSchema, verifyPassword } from "../../../utils/joi.schema"
+import { signupSchema, userCredential, driverSignupSchema, refreshToken, authBearerSchema, verifyPassword , signUpSchema } from "../../../utils/joi.schema"
 import authentication from '../../../middleware/authentication';
 import authorization from '../../../middleware/authorization';
 import schema from './schema';
-import { RoleEnum } from '../roles/Role';
 
 export class AccessRoutes {
 
@@ -20,7 +19,7 @@ export class AccessRoutes {
 
     this.router.post(
       '/signup',
-      // validator(signupSchema),
+      validator(signUpSchema),
       this.controller.signup
     )
 
@@ -53,7 +52,7 @@ export class AccessRoutes {
 
     this.router.get(
       '/users',
-      // authentication,
+      authentication,
       // authorization(["COMPANY_ADMIN", "ADMIN"]),
       this.controller.getUsers
     )

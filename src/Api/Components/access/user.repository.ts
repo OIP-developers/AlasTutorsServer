@@ -1,14 +1,13 @@
 import User, { UserModel } from './User';
-import Role from '../roles/Role';
+import { Role } from '@prisma/client';
 import RoleRepo from "../roles/role.repository"
 import { InternalError } from '../../../core/ApiError';
 import bcrypt from 'bcrypt';
 import KeystoreRepo from './keystore.repository';
-import Keystore from './Keystore';
 import Logger from '../../../core/Logger'
 import { Prisma } from '@prisma/client';
 import slugify from 'slugify';
-
+import { StudentModel } from './Student';
 export default class UserRepo {
 
   public static find({ where }: { where: Prisma.UserWhereInput }): Promise<User[] | null> {
@@ -17,7 +16,17 @@ export default class UserRepo {
     })
   }
 
-  public static findUsers(role:any): Promise<User[] | null> {
+  public static findStudents(role: Role['code'], id: string) {
+    const query: Prisma.StudentWhereInput = {};
+    if (role === "PARENT") {
+      query.parentId = id
+    }
+    return StudentModel.findMany({
+      where: query
+    })
+  }
+
+  public static findUsers(role: any): Promise<User[] | null> {
     return UserModel.findMany({
       where: {
         role: { code: role }
@@ -109,7 +118,28 @@ export default class UserRepo {
             code: true
           }
         },
+        students: true,
       }
+    })
+  }
+
+  public static findByUsername(username: string): Promise<User | null> {
+    return UserModel.findFirst({
+      where: { username },
+      include: {
+        role: {
+          select: {
+            id: true,
+            code: true
+          }
+        }
+      }
+    })
+  }
+
+  public static findParentById(id: string): Promise<User | null> {
+    return UserModel.findUnique({
+      where: { id }
     })
   }
 
@@ -124,19 +154,28 @@ export default class UserRepo {
     const role = await RoleRepo.findByCode(roleCode)
     if (!role) throw new InternalError('Role must be defined in db!');
 
-    user.password = bcrypt.hashSync(user.password || "NotPossible", 10);
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    if (!user.password) {
+      //generating random password
+      user.password = Array.from({ length: 8 }, () => charset[Math.floor(Math.random() * charset.length)]).join('');
+    }
+    const password = bcrypt.hashSync(user.password, 10);
     user.roleId = role.id;
-    user.phone_status = 'VERIFIED' // 'VERIFIED'; // 'PENDING'
-    user.gender = 'MALE'
+
     user.createdAt = user.updatedAt = now;
-    user.stripe_customerId=''
+    user.stripe_customerId = ''
     // @ts-ignore 
     delete user.role
+    let username = (`${user.first_name}.${user.last_name}`).toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
 
-    user.username = slugify(`${user.first_name}-${user.last_name}`)
-
+    //to generate a unique username
+    const userCount = await UserModel.count();
+    username = username.toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
+    username = `${username}.${userCount}`;
+    user.username = slugify(username);
+    console.log(user)
     const createdUser = await UserModel.create({
-      data: { ...user },
+      data: { ...user, password },
       include: {
         role: {
           select: {

@@ -97,8 +97,17 @@ class CourseCategoryRepo {
         });
     }
     static findById(id) {
+        console.log("params.id", id);
         return Course_Category_1.CourseCategoryModel.findUnique({
             where: { id },
+            include: {
+                // id:true,
+                courses: {
+                    include: {
+                        thumbnail: true
+                    }
+                },
+            }
         });
     }
 }
