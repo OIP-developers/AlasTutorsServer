@@ -7,7 +7,7 @@ export default class InvoiceRepo {
     return InvoiceModel
       .findUnique({
         where: { id },
-        include: { order: true, user: true }
+        include: { user: true }
       })
   }
 
@@ -15,7 +15,7 @@ export default class InvoiceRepo {
     return InvoiceModel
       .findMany({
         where: { ...query, isDeleted: false },
-        include: { order: true, user: true },
+        include: { user: true },
         orderBy: { createdAt: 'desc' }
       })
   }
@@ -23,7 +23,7 @@ export default class InvoiceRepo {
   public static async create(body: Invoice): Promise<{ invoice: Invoice }> {
     const invoice = await InvoiceModel.create({
       data: body,
-      include: {order: true, user: true},
+      include: { user: true },
     });
     return { invoice };
   }
@@ -33,7 +33,7 @@ export default class InvoiceRepo {
       .update({
         where: { stripe },
         data: body,
-        include: { order: true, user: true },
+        include: { user: true },
       })
     if (!invoice) throw new BadRequestError('invoice not found!');
     return { invoice };

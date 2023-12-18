@@ -26,21 +26,12 @@ export class InvoiceService {
   }
 
   async paymentIntentCreate(
-    { orderId, body, customerId, user }: { orderId: string, body: any, customerId: null | string, user: User }
+    { body, customerId, user }: { orderId?: string, body: any, customerId: null | string, user: User }
   ) {
-    // const Product = await ProductModel.findFirst({ where: { id: body.id } })
-    // if (!Product) throw new BadRequestError("Invalid Product")
-
-    const Order = await OrderModel.findFirst({ 
-      where: { id: orderId },
-      include:{
-        items:true,
-        user:true
-      }
-     })
 
     const email: string | undefined = user.email ?? undefined;
     const name: string | undefined = user.first_name ?? undefined;
+
     if (user.stripe_customerId) {
       const customer = await this.updateCustomer(user.stripe_customerId, {
         email: email,
@@ -57,13 +48,12 @@ export class InvoiceService {
       Logger.info(`stripe customer created ${customerId}`);
     }
 
-    let totalAmount = Math.round(Number(Order?.total));
-    console.log("totalAmount",totalAmount)
+    let totalAmount = 20;
 
     const payment = await this._paymentIntentCreate({
       currency: 'usd',
       customer: customerId,
-      amount: 200,
+      amount: body.amount * 100,
       description: "",
     })
 
@@ -75,7 +65,6 @@ export class InvoiceService {
     const { invoice } = await InvoiceRepo.create({
       stripe: payment.id,
       price: totalAmount,
-      orderId: orderId,
       currency: 'USD',
       userId: user.id,
       status: 'initiated',

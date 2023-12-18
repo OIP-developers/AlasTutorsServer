@@ -14,6 +14,11 @@ export const verifyPassword = Joi.object().keys({
   password: Joi.string().required().min(6),
 })
 
+const tuitionType = ['GROUP_CLASS', 'ONE_ON_ONE', 'SUMMER_SCHOOL', 'INTENSIVE_WEEKLONG_COURSE'];
+const subjectChoice = ['ENGLISH', 'MATHS', 'FRENCH', 'SCIENCE', 'SPANISH'];
+const schoolDayAndTimeOptions = ['MONDAY_4PM_6PM', 'WEDNESDAY_4PM_6PM', 'FRIDAY_4PM_6PM', 'MONDAY_5PM_7PM', 'WEDNESDAY_5PM_7PM', 'FRIDAY_5PM_7PM', 'TUESDAY_4PM_6PM', 'THURSDAY_4PM_6PM', 'SATURDAY_1PM_3PM', 'TUESDAY_5PM_7PM', 'THURSDAY_5PM_7PM', 'SATURDAY_11AM_1PM']
+const workingWeekDay = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
+const subjectOptions = ['PAY_AS_YOU_GO_PER_SESSION_25', 'MONTHLY_SCHOOL_TERM_2H_PER_WEEK_PER_SUBJECT_150', 'MONTHLY_SCHOOL_TERM_3H_PER_WEEK_ENGLISH_MATHS_SCIENCE_225', 'SUMMER_SCHOOL_HALF_DAY_PAY_25', 'SUMMER_SCHOOL_HALF_DAY_WEEKLY_120', 'SUMMER_SCHOOL_FULL_DAY_PAY_45', 'SUMMER_SCHOOL_FULL_DAY_PAY_200', 'SUMMER_SCHOOL_WEEKLONG_INTENSIVE_COURSE_FULL_DAY_9AM_6PM_250']
 //  export const jj =   auth: Joi.object()
 //         .keys({
 //             authorization: JoiAuthBearer().required(),
@@ -143,7 +148,16 @@ export const signUpSchema = Joi.object({
     isMedicalConditions: Joi.boolean(),
     typeOfCondition: Joi.string(),
     medicationGiven: Joi.string()
+  }),
+  tuitionDetails: Joi.object({
+    tuitionType: Joi.array().items(Joi.string().valid(...tuitionType)).required(),
+    subjectChoice: Joi.array().items(Joi.string().valid(...subjectChoice)).required(),
+    schoolDayAndTime:Joi.array().items(Joi.string().valid(...schoolDayAndTimeOptions)).required(),
+    summerSchoolHalfDay:Joi.array().items(Joi.string().valid(...workingWeekDay)).required(),
+    summerSchoolFullDay:Joi.array().items(Joi.string().valid(...workingWeekDay)).required(),
+    feeSubscription:Joi.array().items(Joi.string().valid(...subjectOptions)).required()
   })
+
 });
 
 export const updateStudentSchema = Joi.object({

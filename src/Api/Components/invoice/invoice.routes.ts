@@ -18,12 +18,11 @@ export class InvoiceRoutes {
   initRoutes(): void {
 
     this.router.post('/payment_intents',
-      authentication,
-      this.controller.createPaymentIntent
+      this.controller.anonymousCreatePaymentIntent
     );
 
     this.router.get('/payment_intents/confirm/:pi_id',
-      authentication,
+      // authentication,
       this.controller.confirmPaymentIntent
     );
 

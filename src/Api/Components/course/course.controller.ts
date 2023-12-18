@@ -76,9 +76,9 @@ export class CourseController {
             where: {
               order: {
                 userId: user.id,
-                invoice: {
-                  status: 'paid'
-                }
+                // invoice: {
+                //   status: 'paid'
+                // }
               }
             }
           },

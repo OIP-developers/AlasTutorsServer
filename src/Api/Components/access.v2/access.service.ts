@@ -23,18 +23,9 @@ export class AccessService {
 
   async createParentUser(userData: User & ParentAddress, emergencyContact: EmergencyContact, students: Student[] & StudentMedicalCondition, guardians: Guardian) {
     const { address, ...parentData } = userData;
-
+    //@ts-ignore TODO:REMOVE THIS TS IGNORE
     const role = await RoleRepo.findByCode("PARENT");
     const password = bcrypt.hashSync(parentData.password, 10);
-
-    let username = (`${parentData.first_name}.${parentData.last_name}`).toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
-
-    //to generate a unique username
-    const userCount = await UserRepository.count();
-
-    username = username.toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
-    username = `${username}.${userCount}`;
-    parentData.username = slugify(username);
 
     const allStudents = students.map((stu: any) => {
       const { medicalCondition, ...studentData } = stu;

@@ -6,13 +6,86 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-// @Enums
+// ENUMS
+
+enum TokenType {
+  SIGNIN
+  SIGNUP
+  EMAIL_VERIFY
+  PHONE_VERIFY
+  TWO_FACTOR_AUTHENTICATION
+  FORGOT_PASSWORD
+}
+
+enum SubscriptionType {
+  CUSTOM
+  PRE_DEFINED
+  REQUESTED
+}
+
+enum Currency {
+  USD
+  PKR
+  INR
+}
+
+enum InvoiceStatus {
+  initiated
+  paid
+  reject
+  cancel
+}
+
+enum Status {
+  PUBLIC
+  PRIVATE
+  DRAFT
+}
+
+enum SubjectChoice {
+  ENGLISH
+  MATHS
+  FRENCH
+  SCIENCE
+  SPANISH
+}
+
+enum WEEK_DAYS {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}
+
+enum WORK_DAYS {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  EVERY_DAY
+}
+
+enum EmploymentPostion {
+  ENGLISH_TEACHER
+  MATHS_TEACHER
+  SCIENCE_TEACHER
+  LANGUAGE_TEACHER
+  OTHER
+}
+
+enum ProofOfRightToWork {
+  PRE_SETTLED_STATUS
+  SETTLED_STATUS
+  BRITISH_PASSPORT
+}
 
 enum Gender {
   MALE
@@ -21,14 +94,13 @@ enum Gender {
 }
 
 enum RoleCode {
-  // ADMIN
-  // STORE_ADMIN
-  // STORE_PRODUCT_MANAGER
-  // STORE_ORDER_MANAGER
+  ANONYMOUS
   ADMIN
-  STUDENT
-  PARENT
   TEACHER
+  PARENT
+  STUDENT
+  OTHER
+  CONSUMER
 }
 
 enum PhoneStatus {
@@ -51,9 +123,51 @@ enum GuardianType {
   OTHER
 }
 
+// ENUMS
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
+// MODELS
+
+model TuitionDetails {
+  tuitionType         String
+  subjectChoice       SubjectChoice
+  schoolDayAndTime    String
+  summerSchoolHalfDay WEEK_DAYS
+  summerSchoolFullDay WEEK_DAYS
+  feeSubscription     String
+  studentId           String
+  student             Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@id([studentId])
+}
+
+model AvaiableForWorkDays {
+  id     String    @id @default(uuid())
+  day    WORK_DAYS
+  userId String
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EduicationLevelTeach {
+  id     String    @id @default(uuid())
+  day    WORK_DAYS
+  userId String
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmploymentApplication {
+  position                EmploymentPostion  @default(ENGLISH_TEACHER)
+  subject                 String?
+  nationalInsuranceNumber String?
+  isRightToWorkInUK       Boolean
+  isFullyQualified        Boolean
+  proofOfRightToWork      ProofOfRightToWork
+  teacherId               String
+  teacher                 User               @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@id([teacherId])
+}
 
 model Role {
   id        String   @id @default(uuid())
@@ -92,6 +206,7 @@ model Tokenstore {
 model Address {
   line1      String
   line2      String?
+  state      String?
   city       String
   postalCode String
   country    String
@@ -148,6 +263,7 @@ model Student {
   parentId                String
   parent                  User?             @relation(fields: [parentId], references: [id])
   medicalCondition        MedicalCondition?
+  tuitionDetails          TuitionDetails?
 }
 
 model Guardian {
@@ -164,7 +280,6 @@ model Guardian {
 
 model User {
   id                String  @id @default(uuid())
-  username          String  @unique // auto generate
   email             String  @unique
   password          String // auto generate
   phone             String?
@@ -173,6 +288,8 @@ model User {
   first_name      String?
   middle_name     String?
   last_name       String?
+  title           String?
+  preffered_name  String?
   profile_picture String?
   gender          Gender?
   dateOfBirth     DateTime?
@@ -192,18 +309,21 @@ model User {
   address          Address?
   emergencyContact EmergencyContact?
 
-  guardians  Guardian[]
-  invoices   Invoice[]
-  keystore   Keystore[]
-  tokenstore Tokenstore[]
-  reviews    CourseReview[]
-  files      File[]
-  courses    Course[]
-  orders     Order[]
-  cart       Cart[]
-  wallet     Wallet?
-  views      View[]
-  students     Student[]
+  guardians             Guardian[]
+  invoices              Invoice[]
+  keystore              Keystore[]
+  tokenstore            Tokenstore[]
+  reviews               CourseReview[]
+  files                 File[]
+  courses               Course[]
+  orders                Order[]
+  cart                  Cart[]
+  wallet                Wallet?
+  views                 View[]
+  students              Student[]
+  employmentApplication EmploymentApplication?
+  AvaiableForWorkDays   AvaiableForWorkDays[]
+  EduicationLevelTeach  EduicationLevelTeach[]
 }
 
 model File {
@@ -233,40 +353,6 @@ model File {
   mediaVideo Video[] @relation("media")
 
   thumbnailVideo Video[] @relation("thumbnailVideo")
-}
-
-enum TokenType {
-  SIGNIN
-  SIGNUP
-  EMAIL_VERIFY
-  PHONE_VERIFY
-  TWO_FACTOR_AUTHENTICATION
-  FORGOT_PASSWORD
-}
-
-enum SubscriptionType {
-  CUSTOM
-  PRE_DEFINED
-  REQUESTED
-}
-
-enum Currency {
-  USD
-  PKR
-  INR
-}
-
-enum InvoiceStatus {
-  initiated
-  paid
-  reject
-  cancel
-}
-
-enum Status {
-  PUBLIC
-  PRIVATE
-  DRAFT
 }
 
 model CourseCategory {
@@ -419,7 +505,6 @@ model Order {
   isDeleted Boolean?     @default(false)
   createdAt DateTime?    @default(now())
   updatedAt DateTime?    @updatedAt
-  invoice   Invoice?
   items     OrderItems[]
 }
 
@@ -457,9 +542,6 @@ model Invoice {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId String @unique
-
   status    InvoiceStatus
   isDeleted Boolean?      @default(false)
   createdAt DateTime?     @default(now())
@@ -485,65 +567,3 @@ model Cart {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 }
-
-// model Paid {
-//   id String @id @default(uuid())
-
-//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   userId String
-
-//   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-//   courseId String
-
-//   // quantity Int?
-
-//   isDeleted Boolean?  @default(false)
-//   createdAt DateTime? @default(now())
-//   updatedAt DateTime? @updatedAt
-// }
-
-// model AddCourseCart {
-//   userId String
-//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-//   courseId String
-//   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-//   @@id([userId, courseId])
-// }
-
-// model OrderItems {
-//   id String @id @default(uuid())
-
-//   quantity Int
-
-//   order   Order?  @relation(fields: [orderId], references: [id])
-//   orderId String?
-
-//   product   Product? @relation(fields: [productId], references: [id])
-//   productId String?
-
-//   isDeleted Boolean?  @default(false)
-//   createdAt DateTime? @default(now())
-//   updatedAt DateTime? @updatedAt
-// }
-
-// model VideoLock {
-//   id String @id @default(uuid())
-
-//   userId String
-//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-//   videoId String
-//   video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
-// }
-
-// model Review {
-//   id          String  @id @default(uuid())
-//   userId      String
-//   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   courseId    String
-//   course      Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-//   reviews     Float
-//   description String?
-// }

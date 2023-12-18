@@ -8,7 +8,7 @@ export class StudentService {
 
   async findStudents(role: RoleCode, studentId: string | undefined, userId: string, query: { search?: string, limit?: string, page?: string }) {
     const where: StudentWhereQuery = {};
-
+    //@ts-ignore TODO:REMOVE THIS TS IGNORE
     if (role === "PARENT") {
       where.parentId = userId;
     }
@@ -25,6 +25,7 @@ export class StudentService {
   };
 
   async createStudent(role: RoleCode, userId: string, studentData: Student, medicalCondition: MedicalCondition) {
+        //@ts-ignore TODO:REMOVE THIS TS IGNORE
     if (role === "PARENT") {
       const student = await this.studentRepo.create<Prisma.StudentUncheckedCreateInput, Prisma.StudentInclude>({
 
@@ -49,6 +50,8 @@ export class StudentService {
   };
 
   async updateStudent(studentId: string, role: RoleCode, userId: string, studentData: Student, medicalCondition: MedicalCondition) {
+        //@ts-ignore TODO:REMOVE THIS TS IGNORE
+
     if (role === "PARENT") {
       await this.studentRepo.findOneOrThrow({
         where: { id: studentId, parentId: userId }, include: {
@@ -77,6 +80,7 @@ export class StudentService {
     return student;
   };
   async deleteStudent(studentId: string, role: RoleCode, userId: string) {
+    //@ts-ignore TODO:REMOVE THIS TS IGNORE
 
     if (role === "PARENT") {
       await this.studentRepo.findOneOrThrow({

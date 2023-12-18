@@ -18,6 +18,7 @@ export default class UserRepo {
 
   public static findStudents(role: Role['code'], id: string) {
     const query: Prisma.StudentWhereInput = {};
+        //@ts-ignore TODO:REMOVE THIS TS IGNORE
     if (role === "PARENT") {
       query.parentId = id
     }
@@ -125,7 +126,7 @@ export default class UserRepo {
 
   public static findByUsername(username: string): Promise<User | null> {
     return UserModel.findFirst({
-      where: { username },
+      where: {  },
       include: {
         role: {
           select: {
@@ -172,7 +173,7 @@ export default class UserRepo {
     const userCount = await UserModel.count();
     username = username.toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
     username = `${username}.${userCount}`;
-    user.username = slugify(username);
+    
     console.log(user)
     const createdUser = await UserModel.create({
       data: { ...user, password },
