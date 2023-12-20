@@ -1,5 +1,5 @@
 import { model, Schema, Document } from 'mongoose';
-import Role, { Permissions } from './Role';
+import Role from './Role';
 import { BUSINESS_DOCUMENT_NAME } from '../../Api/Components/business/business';
 import { DOCUMENT_NAME as RolesDocumentName } from '../../database/model/Role';
 
@@ -9,7 +9,7 @@ export const INSTRUCTOR_PERMISSION = "Create Courses"
 
 
 export class User extends Document implements IUser {
-  id: Schema.Types.ObjectId ;
+  id: Schema.Types.ObjectId;
   name: string = '';
   google_id?: string | undefined = '';
   facebook_id?: string | undefined = '';
@@ -17,14 +17,14 @@ export class User extends Document implements IUser {
   email?: string | undefined = '';
   password?: string | null | undefined = '';
   profilePicUrl?: string | undefined = '';
-  role?: Role | undefined ;
+  role?: Role | undefined;
   verified?: boolean | undefined = true;
   status?: boolean | undefined = true;
   createdAt: Date = new Date();
   updatedAt?: Date | undefined = new Date();
   first_name: string = '';
   last_name: string = '';
-  date_of_birth: Date = new Date() ;
+  date_of_birth: Date = new Date();
   phone: string = '';
   address: { longitude: string; latitude: string; detail: string; };
   business: string = '';
@@ -107,13 +107,13 @@ const schema = new Schema(
       type: Schema.Types.String,
       trim: true,
       maxlength: 100,
+      required: false,
     },
     email: {
       type: Schema.Types.String,
-      required: false,
+      required: true,
       unique: true,
       trim: true,
-      select: false,
     },
     password: {
       type: Schema.Types.String,
@@ -128,11 +128,6 @@ const schema = new Schema(
     role: {
       type: Schema.Types.ObjectId,
       ref: RolesDocumentName,
-      required: true,
-    },
-    business: {
-      type: Schema.Types.ObjectId,
-      ref: BUSINESS_DOCUMENT_NAME,
       required: true,
     },
 
@@ -160,7 +155,6 @@ const schema = new Schema(
     life_experience: { type: Schema.Types.String, required: false },
     designation: { type: Schema.Types.String, required: false },
     is_mentor: { type: Schema.Types.String, required: false },
-    permissions: [{ type: Schema.Types.Mixed, required: false, enum: [Permissions.ANNOTATE_FILES, Permissions.BECOME_A_MENTOR, Permissions.BRAND_CULTURE_STRATEGY, Permissions.COMMENT, Permissions.CREATE_CAMPAIGN, Permissions.CREATE_COURSES, Permissions.CREATE_EVENTS, Permissions.CREATE_FOLDERS, Permissions.CREATE_POLLS, Permissions.CREATE_RESOURCE_GROUP, Permissions.CREATE_REWARDS_PROGRAM, Permissions.CREATE_SURVEYS, Permissions.CREATE_TASKS, Permissions.CREATE_WORKSPACE, Permissions.DOWNLOAD_FILES, Permissions.MANAGE_AGENDA, Permissions.MANAGE_BRAND_ASSETS, Permissions.REVIEW, Permissions.SHARE_FOR_REVIEW, Permissions.UPLOAD_FILES, Permissions.USE_PEN_ERASE, Permissions.VOTE_IN_POLLS] }],
     createdBy: { type: Schema.Types.ObjectId, required: false },
 
     businessQuestionsAnswered: {
@@ -194,5 +188,3 @@ const schema = new Schema(
 );
 
 export const UserModel = model<IUser>(USER_DOCUMENT_NAME, schema, USER_COLLECTION_NAME);
-
-//TODO: Create mechanism of default password. 
