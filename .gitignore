@@ -10,6 +10,8 @@ logs
 
 # ignore 3rd party lib
 node_modules
+build
+dist
 
 # ignore test converage
 coverage
@@ -17,8 +19,3 @@ coverage
 # Environment varibles
 *.env
 *.env.*
-
-# Lock file
-package-lock.json
-yarn.lock
-*.lock

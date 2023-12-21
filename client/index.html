@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telegram</title>
+    <!-- http://localhost:5000/api/v1/login/telegram -->
+  </head>
+  <body>
+    <h1>Telegram</h1>
+    <button onclick="onTelegramAuth()" >Click</button>
+    <script
+      async
+      src="https://telegram.org/js/telegram-widget.js?19"
+      data-telegram-login="kingchart_bot"
+      data-size="large"
+      data-onauth="onTelegramAuth(user)"
+      data-request-access="write"
+    ></script>
+    <!-- <script type="text/javascript">
+      function onTelegramAuth(user) {
+        console.log(user);
+        // alert(
+        //   'Logged in as ' +
+        //     user.first_name +
+        //     ' ' +
+        //     user.last_name +
+        //     ' (' +
+        //     user.id +
+        //     (user.username ? ', @' + user.username : '') +
+        //     ')',
+        // );
+      }
+      // onTelegramAuth()
+    </script> -->
+  </body>
+</html>
