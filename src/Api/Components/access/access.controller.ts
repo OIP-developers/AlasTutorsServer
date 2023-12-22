@@ -18,11 +18,30 @@ import RoleRepo from "../../../database/repository/RoleRepo";
 import Role, { RoleCode } from "../../../database/model/Role";
 
 import { selectArray } from "../../../database/repository/UserRepo";
+import { Repository as TeacherRepo } from "../teacher/teacher.repository";
 
 export class AccessController {
 
   readonly service: AccessService = new AccessService()
-  // readonly BusinessService = new BusinessService()
+
+  signupTeacher = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { personalInfo, data } = req.body
+
+      const user = await UserRepo.findByEmail(personalInfo.email);
+      if (user) throw new BadRequestError('User already registered');
+
+      const { tokens, user: createdUser } = await this.service.generate('SIGNUP', personalInfo as User)
+
+      //need to implement error handling here
+      await TeacherRepo.create({ userId: createdUser._id, data: data })
+
+      new SuccessResponse('Signup Successful', {
+        user: _.pick(createdUser, ['_id', 'first_name' , 'last_name']),
+        tokens,
+      }).send(res);
+    }
+  )
 
   signup = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -46,11 +65,12 @@ export class AccessController {
 
       const user = await UserRepo.findByEmail(req.body.email);
 
-      console.log(user, "user")
+      console.log(user, "user===============================")
 
       if (!user) throw new BadRequestError('Invalid credentials');
 
-      if (!user.password || !user.email) throw new BadRequestError('Credential not set');
+
+      if (!user.password || !user.email) throw new BadRequestError('Credential not sent');
 
       comparePassword(req.body.password, user.password)
 
@@ -154,12 +174,5 @@ export class AccessController {
       new SuccessResponse('update success', { user }).send(res);
     }
   )
-
-  // businessDetails = asyncHandler(
-  //   async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-  //     const { business } = await this.BusinessService.BusinessSave(req.user._id, req.body)
-  //     new SuccessResponse('success', { business }).send(res);
-  //   }
-  // )
 
 }

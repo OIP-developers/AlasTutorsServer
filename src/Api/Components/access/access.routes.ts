@@ -18,9 +18,9 @@ export class AccessRoutes {
   initRoutes(): void {
 
     this.router.post(
-      '/signup',
-      validator(signupSchema),
-      this.controller.signup
+      '/signup-teacher',
+      // validator(signupSchema),
+      this.controller.signupTeacher
     )
 
     this.router.post(

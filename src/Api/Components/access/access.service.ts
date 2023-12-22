@@ -17,8 +17,6 @@ export class AccessService {
         user as User,
         accessTokenKey,
         refreshTokenKey,
-        // @ts-ignore
-        user.role,
       );
       user = createdUser
     }
