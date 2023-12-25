@@ -13,6 +13,7 @@ config();
 
     // Init express server
     const server = new Server()
+    
 
     // Start express server
     server.listen();
