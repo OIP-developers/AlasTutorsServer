@@ -63,7 +63,9 @@ export class AccessController {
       const customerId = customer.id;
 
       const { payment } = await this.stripeService.paymentIntentCreate({
-        body: {},
+        body: {
+          amount : data.stripe.amount
+        },
         customerId,
         user: createdUser,
       });

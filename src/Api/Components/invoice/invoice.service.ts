@@ -39,7 +39,7 @@ export class InvoiceService {
       Logger.info(`stripe customer created ${customerId}`);
     }
 
-    let totalAmount = 20;
+    let totalAmount = body.amount;
 
     
     const payment = await this._paymentIntentCreate(totalAmount * 100, customerId)
