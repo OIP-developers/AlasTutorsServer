@@ -100,5 +100,7 @@ export const tokenInfo = {
 
 export const StripeCred = {
   // clientSecret: 'pk_test_51Lc8HiKuANEC8G8JnyEVmTrI32B9N8tQaSENdwz4yamiL2SrE2iCl4M5dJYzovq8mu2Db6rm8VLtCBEaB77jhDDx003MjKkjdV'
-  clientSecret : 'sk_test_51KQVarSBsAitFG6tdmFgTNPHETygSfIp9FSUMG1N6v77ZE2OnWxiBjSe2ruzsqwyz22kroaDc5csTuZSGrMUfd7e00kl6szAvk'
+  // clientSecret : 'sk_test_51KQVarSBsAitFG6tdmFgTNPHETygSfIp9FSUMG1N6v77ZE2OnWxiBjSe2ruzsqwyz22kroaDc5csTuZSGrMUfd7e00kl6szAvk'
+  clientSecret : 'sk_test_51ORdC2HT10BTLhJJukNuA5ezQ8S5SD326atbKB5axGQLxMSHfIwHKpo4KK4tck8oSB8KRDsyjugw4bCvIqOvyRr400WbmsffyS'
+
 }
