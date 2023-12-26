@@ -165,14 +165,16 @@ export class AccessController {
 
       if (!user.password || !user.email) throw new BadRequestError('Credential not sent');
 
+      const userWithData = await UserRepo.findByEmailWithData(user.email , user.type.toLowerCase())
+
       comparePassword(req.body.password, user.password)
 
-      const { tokens } = await this.service.generate('SIGNIN', user as User)
+      const { tokens } = await this.service.generate('SIGNIN', userWithData as User)
 
       Logger.info("Login Success", { user: _.pick(user, selectArray) })
 
       new SuccessResponse('Login Success', {
-        user: _.pick(user, selectArray),
+        user: _.pick(userWithData, selectArray),
         tokens: tokens,
       }).send(res);
 

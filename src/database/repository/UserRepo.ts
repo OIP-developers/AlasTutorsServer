@@ -45,16 +45,12 @@ export default class UserRepo {
   public static findById(id: Types.ObjectId): Promise<User | null> {
     return UserModel.findOne({ _id: id, status: true })
       .select(selectString)
-      .populate({
-        path: 'role business',
-        select: "-status"
-      })
       .lean<User>()
       .exec();
   }
 
   //need to make this generic for every role
-  public static async findByEmailWithData(email: string): Promise<User | null> {
+  public static async findByEmailWithData(email: string , tableName : string): Promise<User | null> {
     const result = await UserModel.aggregate([
       {
         $match: {
@@ -63,7 +59,7 @@ export default class UserRepo {
       },
       {
         $lookup: {
-          from: "teacher",
+          from: tableName,
           localField: "_id",
           foreignField: "userId",
           as: "userData",
