@@ -1,11 +1,8 @@
 import Stripe from 'stripe';
 import { BadRequestError } from '../../../core/ApiError';
 import { StripeCred } from "../../../config/globals"
-// import Product, { ProductModel } from '../product/Product'
-// import { ProductRepo } from '../product/product.repository'
-// import OrderRepo from '../order/order.repository'
 import Logger from '../../../core/Logger';
-import { InvoiceModel } from '../../../database/model/Invoice';
+import { InvoiceModel } from './invoice.entity';
 
 export class InvoiceService {
 

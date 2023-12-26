@@ -6,7 +6,6 @@ import { createTokens, getAccessToken, validateTokenData } from '../../../utils/
 import { NoDataError, BadRequestError } from '../../../core/ApiError';
 import _ from 'lodash';
 import TaskRepo from './Task.repository';
-import userSurveyRepo from "../userSurvey/userSurvey.repository"
 
 export class TaskController {
 

@@ -1,8 +1,8 @@
-import { DEFAULTMAILOPTS, ZOHOMAIL } from '../config'
+import { ZOHOMAIL } from '../config'
 
 import Logger from '../core/Logger'
 import { SMTP } from '../config/globals'
-import nodemailer from 'nodemailer'
+// import nodemailer from 'nodemailer'
 import sgMail from '@sendgrid/mail'
 
 export interface IMessage {
@@ -29,15 +29,15 @@ export const sendMail = (msg: IMessage) => {
     })
 }
 
-const transporter = nodemailer.createTransport({
-  host: ZOHOMAIL.host,
-  port: ZOHOMAIL.port,
-  secure: true,
-  auth: {
-    user: ZOHOMAIL.user,
-    pass: ZOHOMAIL.pass
-  }
-})
+// const transporter = nodemailer.createTransport({
+//   host: ZOHOMAIL.host,
+//   port: ZOHOMAIL.port,
+//   secure: true,
+//   auth: {
+//     user: ZOHOMAIL.user,
+//     pass: ZOHOMAIL.pass
+//   }
+// })
 
 export interface IMessage2 {
   to: string;
@@ -47,25 +47,25 @@ export interface IMessage2 {
   html?: "" | string;
 }
 
-export const sendMail2 = (message: IMessage2) => {
-  return new Promise((resolve, reject) => {
-    if (!message.to || !message.content || !message.subject) {
-      return reject(new Error('Failed because incomplete email parameters'))
-    } else {
-      let options = {}
-      if (message.html) {
-        options = {...message, from: ZOHOMAIL.user, html: message.html}
-      } else {
-        options = {...message, from: ZOHOMAIL.user, html:`<p>${message.text}</p>` }
-      }
-      console.log(options)
-      return transporter.sendMail(options, (error, info) => {
-        if (error) return reject(error);
-        return resolve(info)
-      })
-    }
-  })
-}
+// export const sendMail2 = (message: IMessage2) => {
+//   return new Promise((resolve, reject) => {
+//     if (!message.to || !message.content || !message.subject) {
+//       return reject(new Error('Failed because incomplete email parameters'))
+//     } else {
+//       let options = {}
+//       if (message.html) {
+//         options = {...message, from: ZOHOMAIL.user, html: message.html}
+//       } else {
+//         options = {...message, from: ZOHOMAIL.user, html:`<p>${message.text}</p>` }
+//       }
+//       console.log(options)
+//       return transporter.sendMail(options, (error, info) => {
+//         if (error) return reject(error);
+//         return resolve(info)
+//       })
+//     }
+//   })
+// }
 
 export const findUser = (users: User[], _id: string): [boolean, User, number] => {
   let success = false;

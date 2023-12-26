@@ -29,10 +29,10 @@ export class FileRoutes {
     //   this.controller.imageUploadForEditor
     // )
 
-    this.router.post(
-      '/video',
-      this.controller.videoUpload
-    )
+    // this.router.post(
+    //   '/video',
+    //   this.controller.videoUpload
+    // )
 
     this.router.get(
       '/',

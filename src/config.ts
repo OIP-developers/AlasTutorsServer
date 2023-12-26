@@ -14,13 +14,13 @@
 //   production: process.env.DB_URI,
 // }
 
-// export const ZOHOMAIL = {
-//   user: process.env.ZOHO_USER,
-//   pass: process.env.ZOHO_PASS,
-//   host: process.env.ZOHO_HOST,
-//   port: process.env.ZOHO_PORT,
-//   defaultTo: process.env.ZOHO_DEFAULT_TO
-// }
+export const ZOHOMAIL = {
+  user: process.env.ZOHO_USER,
+  pass: process.env.ZOHO_PASS,
+  host: process.env.ZOHO_HOST,
+  port: process.env.ZOHO_PORT,
+  defaultTo: process.env.ZOHO_DEFAULT_TO
+}
 
 // export const AMAZON_GC = {
 //   currencyCode: process.env.AGC_CURRENCY_CODE,
@@ -39,9 +39,9 @@
 
 // export const corsUrl: string[] = ["http://localhost:3000"];
 
-// export const tokenInfo = {
-//   accessTokenValidityDays: parseInt(process.env.ACCESS_TOKEN_VALIDITY_SEC || '1d'),
-//   refreshTokenValidityDays: parseInt(process.env.REFRESH_TOKEN_VALIDITY_SEC || '1d'),
-//   issuer: process.env.DB_URI || 'ZeltaTech',
-//   audience: process.env.DB_URI || 'ZeltaTech',
-// };
+export const tokenInfo = {
+  accessTokenValidityDays: parseInt(process.env.ACCESS_TOKEN_VALIDITY_SEC || '1d'),
+  refreshTokenValidityDays: parseInt(process.env.REFRESH_TOKEN_VALIDITY_SEC || '1d'),
+  issuer: process.env.DB_URI || 'ZeltaTech',
+  audience: process.env.DB_URI || 'ZeltaTech',
+};

@@ -60,18 +60,18 @@ export class FileController {
   //   }
   // )
 
-  videoUpload = asyncHandler(
-    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-      const cloudFile = await this.fileService.uploadFile({ destFileName: req.files.file.name, filePath: req.files.file.path })
-      const { file } = await FileRepo.create({
-        fileName: cloudFile[0].metadata.name,
-        fileSize: cloudFile[0].metadata.size,
-        fileType: cloudFile[0].metadata.contentType,
-        path: cloudFile[0].metadata.selfLink
-      });
-      new SuccessResponse('Added successfully', { file }).send(res);
-    }
-  )
+  // videoUpload = asyncHandler(
+  //   async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+  //     const cloudFile = await this.fileService.uploadFile({ destFileName: req.files.file.name, filePath: req.files.file.path })
+  //     const { file } = await FileRepo.create({
+  //       fileName: cloudFile[0].metadata.name,
+  //       fileSize: cloudFile[0].metadata.size,
+  //       fileType: cloudFile[0].metadata.contentType,
+  //       path: cloudFile[0].metadata.selfLink
+  //     });
+  //     new SuccessResponse('Added successfully', { file }).send(res);
+  //   }
+  // )
 
   getAll = asyncHandler(
     async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
