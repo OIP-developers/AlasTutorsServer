@@ -29,6 +29,12 @@ export class AccessRoutes {
       this.controller.signupStudent
     )
 
+    this.router.get(
+      '/signup-student/confirmPaymentIntent/:pi_id',
+      // validator(signupSchema),
+      this.controller.confirmPaymentIntent
+    )
+
     this.router.post(
       '/signin',
       validator(userCredential),
@@ -77,10 +83,10 @@ export class AccessRoutes {
       validator(schema.updateInfo),
       this.controller.updateMe
     )
-    
 
 
-    
+
+
   }
 
 }

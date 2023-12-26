@@ -64,23 +64,33 @@ export class AccessController {
 
       const { payment } = await this.stripeService.paymentIntentCreate({
         body: {
-          amount : data.stripe.amount
+          amount : data.tuitionDetails.amount
         },
         customerId,
         user: createdUser,
       });
 
-      const paymentRetrieve = await this.stripeService.paymentIntentRetrieve(payment.id)
-
-      console.log(paymentRetrieve , "paymentRetrieve")
-
       new SuccessResponse('Signup Successful', {
         user: _.pick(createdUser, ['_id', 'first_name', 'last_name']),
         tokens,
+        payment
       }).send(res);
     }
   )
 
+  confirmPaymentIntent = asyncHandler(
+    async (req: any, res: Response, next: NextFunction) => {
+      const payment = await this.stripeService.paymentIntentRetrieve(req.params.pi_id)
+      if (!payment) throw new BadRequestError('payment intent not found');
+      if (payment.status === 'succeeded') {
+        res.redirect("http://alastutors.com/thankyou")
+      }
+      else {
+        // res.redirect("http://alastutors.com/thankyou")
+        throw new BadRequestError('Invoice not paid yet!');
+      }
+    }
+  )
 
   // createPaymentIntent = asyncHandler(
   //   async (req: any, res: Response) => {
