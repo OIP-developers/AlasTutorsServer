@@ -99,6 +99,6 @@ export const tokenInfo = {
 };
 
 export const StripeCred = {
-  clientSecret: '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'
-  //clientSecret : 'sk_test_51KQVarSBsAitFG6tdmFgTNPHETygSfIp9FSUMG1N6v77ZE2OnWxiBjSe2ruzsqwyz22kroaDc5csTuZSGrMUfd7e00kl6szAvk';
+  // clientSecret: 'pk_test_51Lc8HiKuANEC8G8JnyEVmTrI32B9N8tQaSENdwz4yamiL2SrE2iCl4M5dJYzovq8mu2Db6rm8VLtCBEaB77jhDDx003MjKkjdV'
+  clientSecret : 'sk_test_51KQVarSBsAitFG6tdmFgTNPHETygSfIp9FSUMG1N6v77ZE2OnWxiBjSe2ruzsqwyz22kroaDc5csTuZSGrMUfd7e00kl6szAvk'
 }

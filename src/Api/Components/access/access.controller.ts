@@ -13,6 +13,7 @@ import { comparePassword } from "../../../utils/password";
 import JWT from '../../../core/JWT';
 // import { validateTokenData, createTokens, getAccessToken } from '../../../utils/authUtils';
 import { AccessService } from './access.service'
+import { InvoiceService } from '../invoice/invoice.service'
 import Logger from '../../../core/Logger';
 import RoleRepo from "../../../database/repository/RoleRepo";
 import Role, { RoleCode } from "../../../database/model/Role";
@@ -24,6 +25,7 @@ import { Repository as StudentRepo } from "../student/student.repository";
 export class AccessController {
 
   readonly service: AccessService = new AccessService()
+  readonly stripeService: InvoiceService = new InvoiceService()
 
   signupTeacher = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -57,7 +59,18 @@ export class AccessController {
       await StudentRepo.create({ userId: createdUser._id, data: data })
 
       //stripe logic here
+      const customer = await this.stripeService.createCustomer({ email: createdUser.email })
+      const customerId = customer.id;
 
+      const { payment } = await this.stripeService.paymentIntentCreate({
+        body: {},
+        customerId,
+        user: createdUser,
+      });
+
+      const paymentRetrieve = await this.stripeService.paymentIntentRetrieve(payment.id)
+
+      console.log(paymentRetrieve , "paymentRetrieve")
 
       new SuccessResponse('Signup Successful', {
         user: _.pick(createdUser, ['_id', 'first_name', 'last_name']),
@@ -65,6 +78,51 @@ export class AccessController {
       }).send(res);
     }
   )
+
+
+  // createPaymentIntent = asyncHandler(
+  //   async (req: any, res: Response) => {
+
+  //     const customerId = req.user.stripe_customerId;
+
+  //     const { payment, invoice } = await this.service.paymentIntentCreate({
+  //       body: req.body,
+  //       customerId,
+  //       user: req.user,
+  //       orderId: req.body.orderId
+  //     })
+
+  //     new SuccessResponse('payment intent successful', { payment, invoice }).send(res);
+  //   }
+  // )
+
+  // anonymousCreatePaymentIntent = asyncHandler(
+  //   async (req: any, res: Response) => {
+  //     const email = req.body.email
+  //     const first_name = req.body.first_name
+  //     const last_name = req.body.last_name
+  //     let user = await UserModel.findOne({ email });
+  //     const role = await RoleModel.findOne({ code: "ANONYMOUS" });
+  //     if (!user) {
+  //       user = await UserModel.create({ email, role: role?.id, first_name, last_name });
+  //     }
+
+  //     if (user && role && role?.id) {
+  //       const customer = await this.createCustomer({ email: user.email })
+  //       const customerId = customer.id;
+
+  //       const { payment, invoice } = await this.service.paymentIntentCreate({
+  //         body: req.body,
+  //         customerId,
+  //         user: user,
+  //       });
+
+  //       new SuccessResponse('payment intent successful', { payment, invoice }).send(res);
+  //     }
+
+  //   }
+  // )
+
 
   signup = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {

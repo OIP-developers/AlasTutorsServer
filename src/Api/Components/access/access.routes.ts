@@ -24,6 +24,12 @@ export class AccessRoutes {
     )
 
     this.router.post(
+      '/signup-student',
+      // validator(signupSchema),
+      this.controller.signupStudent
+    )
+
+    this.router.post(
       '/signin',
       validator(userCredential),
       this.controller.signin
