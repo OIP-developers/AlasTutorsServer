@@ -19,6 +19,7 @@ import Role, { RoleCode } from "../../../database/model/Role";
 
 import { selectArray } from "../../../database/repository/UserRepo";
 import { Repository as TeacherRepo } from "../teacher/teacher.repository";
+import { Repository as StudentRepo } from "../student/student.repository";
 
 export class AccessController {
 
@@ -37,7 +38,29 @@ export class AccessController {
       await TeacherRepo.create({ userId: createdUser._id, data: data })
 
       new SuccessResponse('Signup Successful', {
-        user: _.pick(createdUser, ['_id', 'first_name' , 'last_name']),
+        user: _.pick(createdUser, ['_id', 'first_name', 'last_name']),
+        tokens,
+      }).send(res);
+    }
+  )
+
+  signupStudent = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { personalInfo, data } = req.body
+
+      const user = await UserRepo.findByEmail(personalInfo.email);
+      if (user) throw new BadRequestError('User already registered');
+
+      const { tokens, user: createdUser } = await this.service.generate('SIGNUP', personalInfo as User)
+
+      //need to implement error handling here
+      await StudentRepo.create({ userId: createdUser._id, data: data })
+
+      //stripe logic here
+
+
+      new SuccessResponse('Signup Successful', {
+        user: _.pick(createdUser, ['_id', 'first_name', 'last_name']),
         tokens,
       }).send(res);
     }

@@ -54,7 +54,7 @@ export default class UserRepo {
   }
 
   //need to make this generic for every role
-  public static async findByEmail(email: string): Promise<User | null> {
+  public static async findByEmailWithData(email: string): Promise<User | null> {
     const result = await UserModel.aggregate([
       {
         $match: {
@@ -79,12 +79,13 @@ export default class UserRepo {
 
     return result.length ? result[0] : null
   }
-  // public static findByEmail(email: string): Promise<User | null> {
-  //   return UserModel.findOne({ email: email, status: true })
-  //     .select('+email +password')
-  //     .lean<User>()
-  //     .exec();
-  // }
+
+  public static findByEmail(email: string): Promise<User | null> {
+    return UserModel.findOne({ email: email, status: true })
+      .select('+email +password')
+      .lean<User>()
+      .exec();
+  }
 
   public static findByTelegram(telegram_id: string): Promise<User | null> {
     return UserModel.findOne({
