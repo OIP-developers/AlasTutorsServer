@@ -1,7 +1,7 @@
 import { Schema, model, Document } from 'mongoose';
 
 export const DOCUMENT_NAME = 'Invoice';
-export const COLLECTION_NAME = 'invoices';
+export const COLLECTION_NAME = 'invoice';
 
 export const enum InvoiceType {
   STUDENT_REGISTRATION = 'STUDENT_REGISTRATION',
