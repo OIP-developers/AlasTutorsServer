@@ -1,12 +1,13 @@
 import { Router } from 'express';
-import { Controller } from './invoice.controller';
-import validator, { ValidationSource } from '../../../helpers/validator';
-import schema from "./schema"
+import { InvoiceController } from './invoice.controller';
+// import authentication from '../../../middleware/authentication';
+// import raw_body from '../../../middleware/raw-body';
+// import authorization from '../../../middleware/authorization';
 
-export class Routes {
+export class InvoiceRoutes {
 
   readonly router: Router = Router();
-  readonly controller: Controller = new Controller()
+  readonly controller: InvoiceController = new InvoiceController()
 
   constructor() {
     this.initRoutes();
@@ -14,34 +15,37 @@ export class Routes {
 
   initRoutes(): void {
 
-    this.router.get(
-      '/',
-      this.controller.getAll
-    )
+    this.router.post('/payment_intents',
+      this.controller.anonymousCreatePaymentIntent
+    );
 
-    this.router.get(
-      '/:_id',
-      validator(schema.paramsId, ValidationSource.PARAM),
-      this.controller.getById
-    )
+    this.router.get('/payment_intents/confirm/:pi_id',
+      this.controller.confirmPaymentIntent
+    );
 
-    this.router.post(
-      '/',
-      validator(schema.create),
-      this.controller.add
-    )
+    // this.router.get('/my',
+    //   // authentication,
+    //   this.controller.getMyInvoices
+    // );
 
-    this.router.delete(
-      '/:_id',
-      validator(schema.paramsId, ValidationSource.PARAM),
-      this.controller.delete
-    )
+    // this.router.get('/',
+    //   this.controller.getInvoicesByUser
+    // );
 
-    this.router.put(
-      '/:_id',
-      validator(schema.paramsId, ValidationSource.PARAM),
-      this.controller.update
-    )
+    // this.router.get('/get_ephemeral_key',
+    //   // authentication,
+    //   this.controller.createCardholder
+    // );
+
+    // // this.router.get('/courses',
+    // //   authentication,
+    // //   this.controller.getCourses
+    // // );
+
+    // // this.router.get('/verify-invoices',
+    // //   this.controller.verifyUserIvoices
+    // // );
+
   }
 
 }
