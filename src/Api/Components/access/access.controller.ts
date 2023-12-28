@@ -208,9 +208,13 @@ export class AccessController {
 
       if (!user.password || !user.email) throw new BadRequestError('Credential not sent');
 
-      const userWithData = await UserRepo.findByEmailWithData(user.email, user.type.toLowerCase())
-
-      comparePassword(req.body.password, user.password)
+      let userWithData = user;
+      //@ts-ignore
+      if (user?.type !== "SUPER_ADMIN") {
+        //@ts-ignore
+        userWithData = await UserRepo.findByEmailWithData(user.email, user.type.toLowerCase())
+      }
+      await comparePassword(req.body.password, user.password)
 
       const { tokens } = await this.service.generate('SIGNIN', userWithData as User)
 
@@ -293,9 +297,9 @@ export class AccessController {
   getUsers = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
 
-      console.log(req.query , "req.query")
+      console.log(req.query, "req.query")
       let { type } = req.query
-      const users = await UserRepo.findUsers({type : type.toUpperCase()});
+      const users = await UserRepo.findUsers({ type: type.toUpperCase() });
       // const users = await UserRepo.findAllWithData(type);
       new SuccessResponse('fetch success', {
         users
