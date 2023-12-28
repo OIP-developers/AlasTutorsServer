@@ -16,6 +16,11 @@ export class Repository {
     return { data };
   }
 
+  public static async createMany(body: IStudent): Promise<{ data: any }> {
+    const data = await StudentModel.insertMany({ ...body } as DocumentModal);
+    return { data };
+  }
+
   public static async delete(id: string): Promise<{ data: DocumentModal }> {
     const data = await StudentModel.findByIdAndDelete(id, { new: true });
     if (!data) throw new NoDataError();

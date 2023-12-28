@@ -28,9 +28,15 @@ export class AccessRoutes {
       // validator(signupSchema),
       this.controller.signupStudent
     )
+    
+    this.router.post(
+      '/signup-parent',
+      // validator(signupSchema),
+      this.controller.signupParent
+    )
 
     this.router.get(
-      '/signup-student/confirmPaymentIntent/:pi_id',
+      '/signup/confirmPaymentIntent/:pi_id',
       // validator(signupSchema),
       this.controller.confirmPaymentIntent
     )

@@ -6,6 +6,7 @@ export const COLLECTION_NAME = 'student';
 
 export interface IStudent {
   userId: Schema.Types.ObjectId | User
+  parentId: Schema.Types.ObjectId | null
   data: any
 }
 
@@ -16,6 +17,11 @@ const schema = new Schema(
     userId: {
       type: Schema.Types.ObjectId,
       required: true
+    },
+    parentId: {
+      type: Schema.Types.ObjectId,
+      ref: "Parent",
+      required: false
     },
     data: Schema.Types.Mixed
   },

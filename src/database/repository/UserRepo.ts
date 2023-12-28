@@ -19,13 +19,9 @@ export const selectArray = [
 
 export default class UserRepo {
 
-  public static findUsers(): Promise<User[]> {
-    return UserModel.find()
-      .select('+email +password +role') // -verified -status
-      .populate({
-        path: 'role',
-        select: "-status"
-      })
+  public static findUsers(query : any): Promise<User[]> {
+    return UserModel.find({...query})
+      .select('+email') // -verified -status
       .lean<User[]>()
       .exec();
   }
@@ -47,6 +43,33 @@ export default class UserRepo {
       .select(selectString)
       .lean<User>()
       .exec();
+  }
+
+  public static async findAllWithData(tableName : string): Promise<User | null> {
+    console.log(tableName , "typrrrrrrrrrrrd")
+    const result = await UserModel.aggregate([
+      {
+        $match: {
+          type: tableName.toUpperCase(),
+        }
+      },
+      // {
+      //   $lookup: {
+      //     from: tableName,
+      //     localField: "_id",
+      //     foreignField: "userId",
+      //     as: "userData",
+      //   },
+      // },
+      // { $unwind: "$userData" },
+      // {
+      //   $addFields: {
+      //     userData: "$userData.data"
+      //   }
+      // },
+    ])
+
+    return result.length ? result[0] : null
   }
 
   //need to make this generic for every role

@@ -21,6 +21,7 @@ import Role, { RoleCode } from "../../../database/model/Role";
 import { selectArray } from "../../../database/repository/UserRepo";
 import { Repository as TeacherRepo } from "../teacher/teacher.repository";
 import { Repository as StudentRepo } from "../student/student.repository";
+import { Repository as ParentRepo } from "../parent/parent.repository";
 
 export class AccessController {
 
@@ -56,7 +57,7 @@ export class AccessController {
       const { tokens, user: createdUser } = await this.service.generate('SIGNUP', personalInfo as User)
 
       //need to implement error handling here
-      await StudentRepo.create({ userId: createdUser._id, data: data })
+      await StudentRepo.create({ userId: createdUser._id, data: data, parentId: null })
 
       //stripe logic here
       const customer = await this.stripeService.createCustomer({ email: createdUser.email })
@@ -64,7 +65,7 @@ export class AccessController {
 
       const { payment } = await this.stripeService.paymentIntentCreate({
         body: {
-          amount : data.tuitionDetails.amount
+          amount: data.tuitionDetails.amount
         },
         customerId,
         user: createdUser,
@@ -77,6 +78,48 @@ export class AccessController {
       }).send(res);
     }
   )
+
+  signupParent = asyncHandler(
+    async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const { personalInfo, data, students } = req.body
+
+      const user = await UserRepo.findByEmail(personalInfo.email);
+      if (user) throw new BadRequestError('User already registered');
+
+      const { tokens, user: createdUser } = await this.service.generate('SIGNUP', personalInfo as User)
+
+      //need to implement error handling here
+      let test = await ParentRepo.create({ userId: createdUser._id, data: data })
+      console.log(test, 'test')
+
+      for await (const student of students) {
+
+        const { user: createdStudent } = await this.service.generate('SIGNUP', student.personalInfo as User)
+
+        await StudentRepo.create({ userId: createdStudent._id, parentId: createdUser._id, data: student.data })
+
+      }
+
+      //stripe logic here
+      const customer = await this.stripeService.createCustomer({ email: createdUser.email })
+      const customerId = customer.id;
+
+      const { payment } = await this.stripeService.paymentIntentCreate({
+        body: {
+          amount: data.tuitionDetails.amount
+        },
+        customerId,
+        user: createdUser,
+      });
+
+      new SuccessResponse('Signup Successful', {
+        user: _.pick(createdUser, ['_id', 'first_name', 'last_name']),
+        tokens,
+        payment
+      }).send(res);
+    }
+  )
+
 
   confirmPaymentIntent = asyncHandler(
     async (req: any, res: Response, next: NextFunction) => {
@@ -165,7 +208,7 @@ export class AccessController {
 
       if (!user.password || !user.email) throw new BadRequestError('Credential not sent');
 
-      const userWithData = await UserRepo.findByEmailWithData(user.email , user.type.toLowerCase())
+      const userWithData = await UserRepo.findByEmailWithData(user.email, user.type.toLowerCase())
 
       comparePassword(req.body.password, user.password)
 
@@ -249,7 +292,11 @@ export class AccessController {
 
   getUsers = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-      const users = await UserRepo.findUsers();
+
+      console.log(req.query , "req.query")
+      let { type } = req.query
+      const users = await UserRepo.findUsers({type : type.toUpperCase()});
+      // const users = await UserRepo.findAllWithData(type);
       new SuccessResponse('fetch success', {
         users
       }).send(res);
