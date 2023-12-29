@@ -73,7 +73,7 @@ export class AccessRoutes {
 
     this.router.get(
       '/users',
-      authentication,
+      // authentication,
       this.controller.getUsers
     )
 

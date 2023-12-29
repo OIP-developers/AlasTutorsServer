@@ -296,11 +296,9 @@ export class AccessController {
 
   getUsers = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-
-      console.log(req.query, "req.query")
       let { type } = req.query
-      const users = await UserRepo.findUsers({ type: type.toUpperCase() });
-      // const users = await UserRepo.findAllWithData(type);
+      // const users = await UserRepo.findUsers({ type: type.toUpperCase() });
+      const users = await UserRepo.findAllWithData(`${type}`.toLowerCase(), { type: type.toUpperCase() });
       new SuccessResponse('fetch success', {
         users
       }).send(res);

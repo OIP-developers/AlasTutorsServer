@@ -19,9 +19,9 @@ export const selectArray = [
 
 export default class UserRepo {
 
-  public static findUsers(query : any): Promise<User[]> {
-    return UserModel.find({...query})
-      .select('+email') // -verified -status
+  public static findUsers(query: any): Promise<User[]> {
+    return UserModel.find({ ...query })
+      .select('+email +data') // -verified -status
       .lean<User[]>()
       .exec();
   }
@@ -45,35 +45,34 @@ export default class UserRepo {
       .exec();
   }
 
-  public static async findAllWithData(tableName : string): Promise<User | null> {
-    console.log(tableName , "typrrrrrrrrrrrd")
+  public static async findAllWithData(tableName: string, { type }: { type: User['type'] }): Promise<User[] | null> {
     const result = await UserModel.aggregate([
       {
         $match: {
-          type: tableName.toUpperCase(),
+          type: type.toUpperCase(),
         }
       },
-      // {
-      //   $lookup: {
-      //     from: tableName,
-      //     localField: "_id",
-      //     foreignField: "userId",
-      //     as: "userData",
-      //   },
-      // },
-      // { $unwind: "$userData" },
-      // {
-      //   $addFields: {
-      //     userData: "$userData.data"
-      //   }
-      // },
+      {
+        $lookup: {
+          from: tableName,
+          localField: "_id",
+          foreignField: "userId",
+          as: "userData",
+        },
+      },
+      { $unwind: "$userData" },
+      {
+        $addFields: {
+          userData: "$userData.data"
+        }
+      },
     ])
 
-    return result.length ? result[0] : null
+    return result
   }
 
   //need to make this generic for every role
-  public static async findByEmailWithData(email: string , tableName : string): Promise<User | null> {
+  public static async findByEmailWithData(email: string, tableName: string): Promise<User | null> {
     const result = await UserModel.aggregate([
       {
         $match: {
