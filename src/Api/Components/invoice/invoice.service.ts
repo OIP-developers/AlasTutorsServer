@@ -42,7 +42,7 @@ export class InvoiceService {
     let totalAmount = body.amount;
 
     
-    const payment = await this._paymentIntentCreate(totalAmount * 100, customerId)
+    const payment = await this._paymentIntentCreate(totalAmount, customerId)
     return { payment, invoice: {} };
   }
 
