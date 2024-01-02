@@ -126,7 +126,15 @@ export class AccessController {
       const payment = await this.stripeService.paymentIntentRetrieve(req.params.pi_id)
       if (!payment) throw new BadRequestError('payment intent not found');
       if (payment.status === 'succeeded') {
+
+        // if(userId){
+
+        // Referal logic here
+        
+
+        // }
         res.redirect("http://alastutors.com/thankyou")
+
       }
       else {
         // res.redirect("http://alastutors.com/thankyou")
