@@ -10,7 +10,7 @@ export const registerApiRoutes = (router: Router, prefix = ''): void => {
   router.use(`${prefix}`, new AccessRoutes().router)
 
 
-  router.use(`${prefix}/haris`, new ReferralRoutes().router)
+  router.use(`${prefix}/referral`, new ReferralRoutes().router)
 
 
   router.use((req: Request, res: Response, next: NextFunction) => next(new NotFoundError()));

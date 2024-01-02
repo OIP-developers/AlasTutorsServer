@@ -23,7 +23,7 @@ const schema = new Schema(
     usedBy: {
       type: Schema.Types.ObjectId,
       ref: "users",
-      required: true
+      required: false
     },
     userId: {
       type: Schema.Types.ObjectId,

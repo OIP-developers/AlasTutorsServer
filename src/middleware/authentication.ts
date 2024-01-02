@@ -13,11 +13,11 @@ import asyncHandler from '../helpers/async';
 const router = Router();
 
 export default router.use(
-  validator(authBearerSchema, ValidationSource.HEADER),
   asyncHandler(async (req: any, res, next) => {    
     req.accessToken = getAccessToken(req.headers.authorization); // Express headers are auto converted to lowercase
     try {
       const payload = await JWT.validate(req.accessToken);
+      console.log(payload , "payload")
       validateTokenData(payload);
 
       const user = await UserRepo.findById(new Types.ObjectId(payload.sub));
@@ -30,6 +30,7 @@ export default router.use(
 
       return next();
     } catch (e) {
+      console.log(e , "eeeeeeeeeeeeeeeeeeee")
       if (e instanceof TokenExpiredError) throw new AccessTokenError(e.message);
       throw e;
     }

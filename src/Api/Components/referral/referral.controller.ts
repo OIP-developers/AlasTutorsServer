@@ -1,6 +1,6 @@
 import { Response, NextFunction } from "express"
 import asyncHandler from "../../../helpers/async";
-import { SuccessResponse, SuccessMsgResponse, BadRequestResponse } from '../../../core/ApiResponse';
+import { SuccessResponse, SuccessMsgResponse, BadRequestResponse, ForbiddenResponse } from '../../../core/ApiResponse';
 import { NoDataError, BadRequestError } from '../../../core/ApiError';
 import _ from 'lodash';
 import { Repository } from './referral.repository';
@@ -25,19 +25,16 @@ export class Controller {
 
   createReferral = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-      const { data } = await Repository.create(req.body);
+      const { data } = await Repository.create({ ...req.body, userId: req.user._id, isUsed: false });
       new SuccessResponse('Referral created successfully', { entity: data }).send(res);
     }
   )
 
-  varifyStatus = asyncHandler(
+  verifyStatus = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-      const result = await Repository.findOne({ userId: req.user._id });
-      if (result.isUsed = false)
-        new SuccessResponse('', { entity: result }).send(res);
-      else {
-        throw new BadRequestResponse("Sorry this referral is already used")
-      }
+      const result = await Repository.findOne({ userId: req.body.userId });
+      if (!result.isUsed) return new SuccessResponse('Referral link valid', { entity: result , success : true }).send(res);
+      return new SuccessResponse('Referral link already used', { entity: result , success : false }).send(res);
     }
   )
 
