@@ -30,12 +30,11 @@ const schema = new Schema(
       ref: "users",
       required: true
     },
-    url: {
+    code: {
       type: Schema.Types.String,
-
-      required: true
+      required: true,
+      unique : true
     },
-
 
   },
   {
