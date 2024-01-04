@@ -22,6 +22,7 @@ import { selectArray } from "../../../database/repository/UserRepo";
 import { Repository as TeacherRepo } from "../teacher/teacher.repository";
 import { Repository as StudentRepo } from "../student/student.repository";
 import { Repository as ParentRepo } from "../parent/parent.repository";
+import { Repository as ReferralRepo } from '../referral/referral.repository';
 
 export class AccessController {
 
@@ -90,7 +91,6 @@ export class AccessController {
 
       //need to implement error handling here
       let test = await ParentRepo.create({ userId: createdUser._id, data: data })
-      console.log(test, 'test')
 
       for await (const student of students) {
 
@@ -125,14 +125,15 @@ export class AccessController {
     async (req: any, res: Response, next: NextFunction) => {
       const payment = await this.stripeService.paymentIntentRetrieve(req.params.pi_id)
       if (!payment) throw new BadRequestError('payment intent not found');
+
       if (payment.status === 'succeeded') {
 
-        // if(userId){
+        let referralCode = req.body.code
 
-        // Referal logic here
-        
+        if (referralCode) {
+          await ReferralRepo.updateByCode({ code: referralCode }, { isUsed: true })
+        }
 
-        // }
         res.redirect("http://alastutors.com/thankyou")
 
       }

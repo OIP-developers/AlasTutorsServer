@@ -9,6 +9,7 @@ import Logger from '../../../core/Logger';
 import { StripeCred } from '../../../config/globals';
 import { UserModel } from '../../../database/model/User';
 import { RoleModel } from '../../../database/model/Role';
+import { Repository as ReferralRepo } from '../referral/referral.repository';
 
 export class InvoiceController {
 
@@ -70,6 +71,13 @@ export class InvoiceController {
       const payment = await this.service.paymentIntentRetrieve(req.params.pi_id)
       if (!payment) throw new BadRequestError('payment intent not found');
       if (payment.status === 'succeeded') {
+
+        let referralCode = req.body.code
+
+        if (referralCode) {
+          await ReferralRepo.updateByCode({ code: referralCode }, { isUsed: true })
+        }
+
         res.redirect("http://alastutors.com/thankyou")
       }
       else {

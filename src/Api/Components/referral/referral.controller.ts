@@ -25,6 +25,9 @@ export class Controller {
 
   createReferral = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
+      const result = await Repository.findOne({ userId: req.user._id });
+      console.log(result, "resultsssss")
+      if (result) return new SuccessResponse('referral link already generated for this user', { entity: result, success: true }).send(res);
       const { data } = await Repository.create({ ...req.body, userId: req.user._id, isUsed: false });
       new SuccessResponse('Referral created successfully', { entity: data }).send(res);
     }
@@ -32,9 +35,17 @@ export class Controller {
 
   verifyStatus = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-      const result = await Repository.findOne({ userId: req.body.userId });
-      if (!result.isUsed) return new SuccessResponse('Referral link valid', { entity: result , success : true }).send(res);
-      return new SuccessResponse('Referral link already used', { entity: result , success : false }).send(res);
+      let query = {}
+
+      if (req.body.userId) {
+        query = { userId: req.body.userId }
+      } else {
+        query = { code: req.body.code }
+      }
+
+      const result = await Repository.findOne({ ...query });
+      if (result && !result.isUsed) return new SuccessResponse('Referral link valid', { entity: result, success: true }).send(res);
+      return new SuccessResponse('Referral link already used', { entity: result, success: false }).send(res);
     }
   )
 

@@ -41,4 +41,10 @@ export class Repository {
     return { data };
   }
 
+  public static async updateByCode(query: any, body: any): Promise<{ data: any }> {
+    const data = await ReferralModel.findOneAndUpdate({ ...query } as any, body, { new: true, runValidators: true });
+    if (!data) throw new NoDataError();
+    return { data };
+  }
+
 }

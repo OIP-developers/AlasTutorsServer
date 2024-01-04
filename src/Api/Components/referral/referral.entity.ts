@@ -30,6 +30,11 @@ const schema = new Schema(
       ref: "users",
       required: true
     },
+    type: {
+      type: Schema.Types.String,
+      enum : ["PARENT" , "STUDENT"],
+      required: true,
+    },
     code: {
       type: Schema.Types.String,
       required: true,
