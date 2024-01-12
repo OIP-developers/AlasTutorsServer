@@ -12,7 +12,7 @@
     "clean": "rimraf ./build/src && rimraf ./build/prisma",
     "dev": "cross-env NODE_ENV=development ts-node-dev --respawn --exit-child src/app.ts",
     "start:prod": "cross-env NODE_ENV=production ts-node-dev --respawn src/app.ts",
-    "pm2:dev": "pm2 start --name 'ZIPAWAY_API' build/src/app.js",
+    "start:pm2": "pm2 start --name 'ZIPAWAY_API' build/src/app.js",
     "seed": "prisma db seed",
     "generate": "prisma generate",
     "migrate": "prisma migrate dev --name init",
