@@ -9,7 +9,8 @@ export class InvoiceService {
   readonly stripe: Stripe = new Stripe(StripeCred.clientSecret, { apiVersion: "2022-08-01" });
 
   async _paymentIntentCreate(amount: number, customer: any) {
-    const intent: any = { amount, currency: "GBP", description: "Registration Discount Payment", payment_method_types: ['card'] };
+    const intent: any = { amount: Math.round(amount * 100), currency: "gbp", description: "Registration Discount Payment", payment_method_types: ['card'] };
+    Logger.warn(amount);
     if (customer) {
       intent.customer = customer;
     }
