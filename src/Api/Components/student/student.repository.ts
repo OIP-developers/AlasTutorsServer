@@ -1,5 +1,7 @@
 import DocumentModal, { IStudent, StudentModel } from './student.entity';
 import { NoDataError } from '../../../core/ApiError';
+import { UserModel } from '../../../database/model/User';
+import Logger from '../../../core/Logger';
 
 export class Repository {
 
@@ -27,8 +29,24 @@ export class Repository {
     return { data };
   }
 
+  public static async findById(id: string): Promise<{ data: DocumentModal }> {
+    const student = await StudentModel.findOne({ userId: id });
+    const user = await UserModel.findById(id);
+    const data = { student, user } as any
+    if (!data) throw new NoDataError();
+    return { data };
+  }
+
   public static async update(id: string, body: DocumentModal): Promise<{ data: any }> {
-    const data = await StudentModel.findByIdAndUpdate(id, { ...body } as DocumentModal, { new: true, runValidators: true });
+    // Exclude _id field from update operation
+    delete body._id;
+
+    // Update user document
+    const user = await UserModel.findByIdAndUpdate(id, body, { new: true, runValidators: true });
+
+    // Update student document
+    const student = await StudentModel.findOneAndUpdate({ userId: id }, body, { new: true, runValidators: true });
+    const data = { student, user } as any
     if (!data) throw new NoDataError();
     return { data };
   }

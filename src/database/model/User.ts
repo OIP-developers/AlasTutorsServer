@@ -8,6 +8,19 @@ enum USER_TYPE {
   PARENT = "PARENT",
   STUDENT = "STUDENT"
 }
+
+enum USER_STATUS {
+  SUSPENDED = "SUSPENDED",
+  DISABLED = "DISABLED",
+  ACTIVE = "ACTIVE"
+}
+
+enum GENDER {
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+  NON_BINARY = "NON_BINARY"
+}
+
 export default interface User extends Document {
   first_name: string
   middle_name: string
@@ -47,6 +60,18 @@ const schema = new Schema(
       type: Schema.Types.String,
       required: false,
       select: false,
+    },
+    gender: {
+      type: Schema.Types.String,
+      required: true,
+      enum: [GENDER.MALE, GENDER.FEMALE, GENDER.NON_BINARY],
+      default: GENDER.MALE
+    },
+    status:{
+      type: Schema.Types.String,
+      required: true,
+      enum: [USER_STATUS.ACTIVE, USER_STATUS.SUSPENDED, USER_STATUS.DISABLED],
+      default: USER_STATUS.ACTIVE
     }
   },
   {
