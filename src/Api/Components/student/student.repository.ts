@@ -24,7 +24,7 @@ export class Repository {
   }
 
   public static async delete(id: string): Promise<{ data: DocumentModal }> {
-    const data = await StudentModel.findByIdAndDelete(id, { new: true });
+    const data = await StudentModel.findOneAndDelete({userId:id}, { new: true });
     if (!data) throw new NoDataError();
     return { data };
   }
