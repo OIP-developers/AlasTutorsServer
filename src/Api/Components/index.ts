@@ -4,6 +4,7 @@ import { NotFoundError } from '../../core/ApiError';
 import { ReferralRoutes } from './referral/referral.routes';
 import { StudentRoutes } from './student/student.routes';
 import { TeacherRoutes } from './teacher/teacher.routes';
+import { ParentRoutes } from './parent/parent.routes';
 
 export const registerApiRoutes = (router: Router, prefix = ''): void => {
 
@@ -11,8 +12,7 @@ export const registerApiRoutes = (router: Router, prefix = ''): void => {
   router.use(`${prefix}`, new AccessRoutes().router)
   router.use(`${prefix}`, new StudentRoutes().router)
   router.use(`${prefix}`, new TeacherRoutes().router)
-
-
+  router.use(`${prefix}`, new ParentRoutes().router)
 
   router.use(`${prefix}/referral`, new ReferralRoutes().router)
 

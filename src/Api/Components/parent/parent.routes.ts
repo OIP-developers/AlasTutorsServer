@@ -3,7 +3,7 @@ import { Controller } from './parent.controller';
 import validator, { ValidationSource } from '../../../helpers/validator';
 import schema from "./schema"
 
-export class Routes {
+export class ParentRoutes {
 
   readonly router: Router = Router();
   readonly controller: Controller = new Controller()
@@ -15,30 +15,30 @@ export class Routes {
   initRoutes(): void {
 
     this.router.get(
-      '/',
+      '/parent',
       this.controller.getAll
     )
 
     this.router.get(
-      '/:_id',
+      '/parent/:_id',
       validator(schema.paramsId, ValidationSource.PARAM),
       this.controller.getById
     )
 
     this.router.post(
-      '/',
+      '/parent',
       validator(schema.create),
       this.controller.add
     )
 
     this.router.delete(
-      '/:_id',
+      '/parent/:_id',
       validator(schema.paramsId, ValidationSource.PARAM),
       this.controller.delete
     )
 
     this.router.put(
-      '/:_id',
+      '/parent/:_id',
       validator(schema.paramsId, ValidationSource.PARAM),
       this.controller.update
     )
