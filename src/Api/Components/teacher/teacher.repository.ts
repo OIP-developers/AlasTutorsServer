@@ -14,8 +14,9 @@ export class Repository {
 
   public static async findById(id: string): Promise<{ data: DocumentModal }> {
     const teacher = await TeacherModel.findOne({ userId: id });
-    const user = await UserModel.findById(id);
+    const user = await UserModel.findById(id, { email: 1, password: 1, gender: 1, first_name: 1, last_name: 1});
     const data = { teacher, user } as any
+    console.log(data)
     if (!data) throw new NoDataError();
     return { data };
   }
