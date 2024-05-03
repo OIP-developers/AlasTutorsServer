@@ -17,9 +17,9 @@ export class Controller {
 
   getById = asyncHandler(
     async (req: any, res: any, next: NextFunction): Promise<Response | void> => {
-      // const data = await Repository.findById(req.params._id);
-      // if (!data) throw new NoDataError();
-      new SuccessResponse('Fetch successfully', { entities: {} }).send(res);
+      const data = await Repository.findById(req.params._id);
+      if (!data) throw new NoDataError();
+      new SuccessResponse('Fetch successfully', { entity: { ...data } }).send(res);
     }
   )
 

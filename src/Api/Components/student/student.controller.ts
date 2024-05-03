@@ -17,16 +17,16 @@ export class Controller {
 
   getById = asyncHandler(
     async (req: any, res: any, next: NextFunction): Promise<Response | void> => {
-      // const data = await Repository.findById(req.params._id);
-      // if (!data) throw new NoDataError();
-      new SuccessResponse('Fetch successfully', { entities: {} }).send(res);
+      const data = await Repository.findById(req.params._id);
+      if (!data) throw new NoDataError();
+      new SuccessResponse('Fetch successfully', { data }).send(res);
     }
   )
 
   add = asyncHandler(
     async (req: any, res: Response, next: NextFunction): Promise<Response | void> => {
-      const { data } = await Repository.create(req.body);
-      new SuccessResponse('Added successfully', { entity: data }).send(res);
+      const { data: student } = await Repository.create(req.body);
+      new SuccessResponse('Added successfully', { entity: student }).send(res);
     }
   )
 

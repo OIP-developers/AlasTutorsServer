@@ -3,6 +3,8 @@ import { config } from 'dotenv'
 import { Server } from './Api/server'
 import Logger from './core/Logger';
 import { connect } from './database';
+import cors from 'cors'
+import helmet from 'helmet'
 
 config();
 
@@ -14,6 +16,14 @@ config();
     // Init express server
     const server = new Server()
     
+    // Enable CORS middleware
+    server.app.use(cors({
+      origin: '*'
+    }));
+
+    // Enhance security with Helmet middleware
+    server.app.use(helmet());
+
 
     // Start express server
     server.listen();

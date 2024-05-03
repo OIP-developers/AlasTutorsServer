@@ -39,7 +39,7 @@ export default class UserRepo {
   }
 
   public static findById(id: Types.ObjectId): Promise<User | null> {
-    return UserModel.findOne({ _id: id, status: true })
+    return UserModel.findOne({ _id: id })
       .select(selectString)
       .lean<User>()
       .exec();
@@ -99,7 +99,8 @@ export default class UserRepo {
   }
 
   public static findByEmail(email: string): Promise<User | null> {
-    return UserModel.findOne({ email: email, status: true })
+    console.log('Email', email)
+    return UserModel.findOne({ email: email, status: 'ACTIVE' })
       .select('+email +password')
       .lean<User>()
       .exec();
